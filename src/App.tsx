@@ -29,6 +29,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   notifications: true,
   maxHistoryItems: 50,
   magnificApiKey: '',
+  bypassPremium: true,
 };
 
 export function App() {

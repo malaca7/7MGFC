@@ -342,31 +342,91 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
     const saveAs = conflictAction === "prompt";
 
-    /*
-     * Não fazemos fetch intermediário
-     * da API para tentar descobrir tokens
-     * ou transformar uma resposta Premium.
-     *
-     * O Chrome realiza o download da URL
-     * oficial fornecida pelo aplicativo.
-     *
-     * Se a sessão autenticada possuir
-     * autorização, o servidor fornecerá
-     * o arquivo.
-     *
-     * Se não possuir, o servidor poderá
-     * responder com login/403/HTML.
-     */
-    chrome.downloads.download(
-      {
-        url,
+    (async () => {
+      try {
+        let finalUrl = url;
+        const isApiEndpoint =
+          url.includes("/api/v1/resources/") ||
+          url.includes("api.magnific.com") ||
+          url.includes("api.freepik.com") ||
+          url.includes("/download/file/");
 
-        filename: targetFilename,
+        if (isApiEndpoint) {
+          const headers: Record<string, string> = {
+            Accept: "application/json, text/plain, */*",
+          };
 
-        conflictAction: action,
+          const response = await fetch(url, {
+            method: "GET",
+            headers,
+            credentials: "include",
+            redirect: "follow",
+          });
 
-        saveAs,
-      },
+          const contentType = (
+            response.headers.get("content-type") || ""
+          ).toLowerCase();
+
+          if (!response.ok) {
+            sendResponse({
+              success: false,
+              error: `O servidor recusou o download (HTTP ${response.status}).`,
+            });
+            return;
+          }
+
+          if (contentType.includes("text/html")) {
+            sendResponse({
+              success: false,
+              error:
+                "O servidor retornou uma página HTML em vez do arquivo. Faça login ou obtenha acesso autorizado ao recurso.",
+            });
+            return;
+          }
+
+          if (contentType.includes("application/json")) {
+            const data = await response.json();
+            const candidate =
+              data?.url ??
+              data?.download_url ??
+              data?.file ??
+              data?.data?.url ??
+              data?.data?.download_url ??
+              data?.data?.file;
+
+            if (
+              typeof candidate !== "string" ||
+              !candidate.startsWith("http")
+            ) {
+              sendResponse({
+                success: false,
+                error: "A API não forneceu uma URL de download autorizada.",
+              });
+              return;
+            }
+
+            try {
+              const candidateUrl = new URL(candidate);
+              if (!["http:", "https:"].includes(candidateUrl.protocol))
+                throw new Error("invalid protocol");
+              finalUrl = candidate;
+            } catch {
+              sendResponse({
+                success: false,
+                error: "A URL retornada pela API é inválida.",
+              });
+              return;
+            }
+          }
+        }
+
+        chrome.downloads.download(
+          {
+            url: finalUrl,
+            filename: targetFilename,
+            conflictAction: action,
+            saveAs,
+          },
       (downloadId) => {
         if (chrome.runtime.lastError || !downloadId) {
           const error =
@@ -405,6 +465,17 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         });
       },
     );
+      } catch (error) {
+        console.error("[7MGFC] Erro ao preparar download:", error);
+        sendResponse({
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Erro desconhecido durante o download.",
+        });
+      }
+    })();
 
     return true;
   }
