@@ -12,7 +12,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(import.meta.dirname, 'app.html'),
-        login: resolve(import.meta.dirname, 'login.html'),
+        index: resolve(import.meta.dirname, 'index.html'),
         background: resolve(import.meta.dirname, 'src/background/service-worker.ts'),
       },
       output: {

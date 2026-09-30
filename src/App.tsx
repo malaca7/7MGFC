@@ -76,7 +76,7 @@ export function App() {
     const savedUser = localStorage.getItem('7mgfc_user');
 
     if (!savedUser && (typeof chrome === 'undefined' || !chrome.extension)) {
-      window.location.href = '/login.html';
+      window.location.href = '/index.html';
       return;
     }
 
@@ -101,7 +101,7 @@ export function App() {
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem('7mgfc_user');
-    window.location.href = '/login.html';
+    window.location.href = '/index.html';
   }, []);
 
   // Limpa intervalo de polling ao desmontar
