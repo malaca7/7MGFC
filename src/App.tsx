@@ -229,6 +229,7 @@ export function App() {
           conflictAction: settings.conflictAction,
           subfolder: settings.subfolder,
           apiKey: settings.magnificApiKey,
+          alternativeUrls: targetResource.alternativeDownloadUrls,
         },
         (res) => {
           if (!res?.success || !res.downloadId) {
@@ -438,6 +439,9 @@ export function App() {
 
         isDirectCdnUrl:
           resolvedDownload.isDirectCdnUrl,
+
+        alternativeDownloadUrls:
+          resolvedDownload.alternativeDownloadUrls,
 
         cdnDetails:
           resolvedDownload.cdnDetails,

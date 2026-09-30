@@ -296,16 +296,15 @@ chrome.downloads.onChanged.addListener((delta) => {
  */
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === "startDownload") {
-    const { url, filename, type, conflictAction, subfolder } = message as {
+    const { url, filename, type, conflictAction, subfolder, apiKey, alternativeUrls } = message as {
       url: string;
-
       filename: string;
-
       type: string;
 
       conflictAction?: "uniquify" | "overwrite" | "prompt";
-
       subfolder?: string;
+      apiKey?: string;
+      alternativeUrls?: string[];
     };
 
     if (!url || typeof url !== "string") {
@@ -356,67 +355,79 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
             Accept: "application/json, text/plain, */*",
           };
 
-          const response = await fetch(url, {
-            method: "GET",
-            headers,
-            credentials: "include",
-            redirect: "follow",
-          });
-
-          const contentType = (
-            response.headers.get("content-type") || ""
-          ).toLowerCase();
-
-          if (!response.ok) {
-            sendResponse({
-              success: false,
-              error: `O servidor recusou o download (HTTP ${response.status}).`,
-            });
-            return;
+          if (apiKey) {
+            headers["Authorization"] = `Bearer ${apiKey}`;
           }
 
-          if (contentType.includes("text/html")) {
-            sendResponse({
-              success: false,
-              error:
-                "O servidor retornou uma página HTML em vez do arquivo. Faça login ou obtenha acesso autorizado ao recurso.",
-            });
-            return;
-          }
+          const urlsToTry = [url, ...(alternativeUrls || [])];
+          let successUrl = null;
+          let candidate = null;
+          let lastError = "Nenhuma URL forneceu uma resposta válida.";
 
-          if (contentType.includes("application/json")) {
-            const data = await response.json();
-            const candidate =
-              data?.url ??
-              data?.download_url ??
-              data?.file ??
-              data?.data?.url ??
-              data?.data?.download_url ??
-              data?.data?.file;
-
-            if (
-              typeof candidate !== "string" ||
-              !candidate.startsWith("http")
-            ) {
-              sendResponse({
-                success: false,
-                error: "A API não forneceu uma URL de download autorizada.",
-              });
-              return;
-            }
-
+          for (const currentUrl of urlsToTry) {
             try {
-              const candidateUrl = new URL(candidate);
-              if (!["http:", "https:"].includes(candidateUrl.protocol))
-                throw new Error("invalid protocol");
-              finalUrl = candidate;
-            } catch {
-              sendResponse({
-                success: false,
-                error: "A URL retornada pela API é inválida.",
+              const response = await fetch(currentUrl, {
+                method: "GET",
+                headers,
+                credentials: "include",
+                redirect: "follow",
               });
-              return;
+
+              const contentType = (
+                response.headers.get("content-type") || ""
+              ).toLowerCase();
+
+              if (!response.ok) {
+                lastError = `O servidor recusou o download (HTTP ${response.status}).`;
+                continue; // Try next URL
+              }
+
+              if (contentType.includes("text/html")) {
+                lastError = "O servidor retornou HTML em vez do arquivo. Faça login.";
+                continue;
+              }
+
+              if (contentType.includes("application/json")) {
+                const data = await response.json();
+                candidate =
+                  data?.url ??
+                  data?.download_url ??
+                  data?.file ??
+                  data?.data?.url ??
+                  data?.data?.download_url ??
+                  data?.data?.file;
+
+                if (typeof candidate === "string" && candidate.startsWith("http")) {
+                  successUrl = currentUrl;
+                  break; // Found a working URL!
+                } else {
+                  lastError = "A API não forneceu uma URL de download autorizada.";
+                }
+              }
+            } catch (err) {
+              lastError = "Erro de conexão com a API oficial.";
             }
+          }
+
+          if (!successUrl || !candidate) {
+            sendResponse({
+              success: false,
+              error: lastError,
+            });
+            return;
+          }
+
+          try {
+            const candidateUrl = new URL(candidate);
+            if (!["http:", "https:"].includes(candidateUrl.protocol))
+              throw new Error("invalid protocol");
+            finalUrl = candidate;
+          } catch {
+            sendResponse({
+              success: false,
+              error: "A URL retornada pela API é inválida.",
+            });
+            return;
           }
         }
 

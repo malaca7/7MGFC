@@ -62,6 +62,7 @@ export interface ResourceDetails {
     isExpired?: boolean;
     hmac?: string;
   };
+  alternativeDownloadUrls?: string[];
 }
 
 export interface DownloadProgress {
