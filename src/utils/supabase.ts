@@ -6,7 +6,7 @@
 
 export const SUPABASE_CONFIG = {
   url: "https://crsqpssomhkpapqcoftr.supabase.co",
-  anonKey: "SUBSTITUA_PELA_SUA_CHAVE_ANON_PUBLICA",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyc3Fwc3NvbWhrcGFwcWNvZnRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3MTM1NjAsImV4cCI6MjEwNjI4OTU2MH0.uzHwP3qK3ynWoITFZqm5I8LrrFeowYOFdy6Hsn--Y84",
 };
 
 export async function fetchUserDailyUsage(

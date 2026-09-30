@@ -230,22 +230,15 @@
     <!-- bcryptjs CDN for client-side password hashing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
     <script>
-        const SUPABASE_URL = 'https://crsqpssomhkpapqcoftr.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyc3Fwc3NvbWhrcGFwcWNvZnRyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MDcxMzU2MCwiZXhwIjoyMTA2Mjg5NTYwfQ.1gVKJCmaO2vZ_VJ7hgY8ZGuF5AhwAgEuoi5Y8d_itjI';
+        const API_URL = 'https://7mgfc.malaca.com.br/api.php';
 
-        async function supabase(endpoint, method = 'GET', body = null, prefer = '') {
-            const headers = {
-                'apikey': SUPABASE_KEY,
-                'Authorization': 'Bearer ' + SUPABASE_KEY,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            };
-            if (prefer) headers['Prefer'] = prefer;
-            const opts = { method, headers };
-            if (body) opts.body = JSON.stringify(body);
-            const res = await fetch(SUPABASE_URL + '/rest/v1/' + endpoint, opts);
-            const data = await res.json().catch(() => null);
-            return { ok: res.ok, status: res.status, data };
+        async function apiRequest(action, data = {}) {
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action, ...data })
+            });
+            return await res.json();
         }
 
         // Tab switching
@@ -287,28 +280,20 @@
             const password = document.getElementById('login-password').value;
 
             try {
-                const res = await supabase('users?username=eq.' + encodeURIComponent(username) + '&select=*');
-                if (!res.ok || !res.data || res.data.length === 0) {
-                    showError('Usuário não encontrado.');
+                const res = await apiRequest('login', { username, password });
+                
+                if (!res.success) {
+                    showError(res.message || 'Erro ao realizar login.');
                     return;
                 }
-                const user = res.data[0];
-
-                if (user.is_active === false) { showError('Conta desativada. Contate o administrador.'); return; }
-                if (user.expires_at && new Date(user.expires_at) < new Date()) { showError('Seu acesso expirou.'); return; }
-
-                const validPwd = dcodeIO.bcrypt.compareSync(password, user.password_hash);
-                if (!validPwd) { showError('Senha incorreta.'); return; }
 
                 // Save session
-                delete user.password_hash;
-                localStorage.setItem('7mgfc_user', JSON.stringify(user));
-                supabase('users?id=eq.' + user.id, 'PATCH', { last_login: new Date().toISOString() }, 'return=minimal');
+                localStorage.setItem('7mgfc_user', JSON.stringify(res.user));
 
-                showSuccess('Login realizado com sucesso!');
+                showSuccess(res.message);
                 setTimeout(() => {
-                    if (user.role === 'admin') {
-                        window.location.href = '/ceo/';
+                    if (res.user.role === 'admin') {
+                        window.location.href = 'https://7mgfc.malaca.com.br/ceo/';
                     } else {
                         window.location.href = '/';
                     }
@@ -332,45 +317,14 @@
             try {
                 if (password.length < 6) { showError('A senha deve ter no mínimo 6 caracteres.'); return; }
 
-                // Check username
-                const existing = await supabase('users?username=eq.' + encodeURIComponent(username) + '&select=id');
-                if (existing.ok && existing.data && existing.data.length > 0) {
-                    showError('Este nome de usuário já está em uso.'); return;
+                const res = await apiRequest('register', { username, password, access_key: accessKey });
+                
+                if (!res.success) {
+                    showError(res.message || 'Erro ao criar conta.');
+                    return;
                 }
 
-                // Check key
-                const keyRes = await supabase('access_keys?key_code=eq.' + encodeURIComponent(accessKey) + '&is_used=eq.false&is_active=eq.true&select=*');
-                if (!keyRes.ok || !keyRes.data || keyRes.data.length === 0) {
-                    showError('Chave de acesso inválida, já utilizada ou desativada.'); return;
-                }
-
-                const key = keyRes.data[0];
-                const now = new Date().toISOString();
-                const expiresAt = key.duration_hours > 0
-                    ? new Date(Date.now() + key.duration_hours * 3600000).toISOString()
-                    : null;
-
-                // Hash password
-                const salt = dcodeIO.bcrypt.genSaltSync(10);
-                const hash = dcodeIO.bcrypt.hashSync(password, salt);
-
-                // Create user
-                const createRes = await supabase('users', 'POST', [{
-                    username, password_hash: hash, daily_limit: 30,
-                    is_active: true, role: 'user',
-                    access_key_used: accessKey, expires_at: expiresAt
-                }], 'return=representation');
-
-                if (!createRes.ok) {
-                    showError('Erro ao criar conta: ' + (createRes.data?.message || 'desconhecido')); return;
-                }
-
-                // Mark key as used
-                await supabase('access_keys?id=eq.' + key.id, 'PATCH', {
-                    is_used: true, used_by: username, used_at: now, expires_at: expiresAt
-                }, 'return=minimal');
-
-                showSuccess('Conta criada com sucesso! Faça login.');
+                showSuccess(res.message);
                 setTimeout(() => {
                     document.getElementById('tab-login').click();
                     document.getElementById('login-username').value = username;
@@ -389,7 +343,7 @@
         if (savedUser) {
             try {
                 const u = JSON.parse(savedUser);
-                if (u.role === 'admin') window.location.href = '/ceo/';
+                if (u.role === 'admin') window.location.href = 'https://7mgfc.malaca.com.br/ceo/';
                 else window.location.href = '/';
             } catch {}
         }

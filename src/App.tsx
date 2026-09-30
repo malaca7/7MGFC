@@ -19,6 +19,7 @@ import {
   formatDate,
 } from './utils';
 import { extractFromActiveTab } from './utils/tabExtractor';
+import { fetchUserDailyUsage } from './utils/supabase';
 
 type ActiveTab = 'downloader' | 'history' | 'settings';
 
@@ -43,6 +44,8 @@ export function App() {
   const [historySearch, setHistorySearch] = useState<string>('');
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [copied, setCopied] = useState<boolean>(false);
+  const [user, setUser] = useState<any>(null);
+  const [usage, setUsage] = useState({ used: 0, limit: 30, remaining: 30 });
 
   const pollIntervalRef = useRef<number | null>(null);
 
@@ -70,12 +73,29 @@ export function App() {
 
   // Auth check para o ambiente web
   useEffect(() => {
-    if (typeof chrome === 'undefined' || !chrome.extension) {
-      const savedUser = localStorage.getItem('7mgfc_user');
+    const savedUser = localStorage.getItem('7mgfc_user');
 
-      if (!savedUser) {
-        window.location.href = '/login.html';
-      }
+    if (!savedUser && (typeof chrome === 'undefined' || !chrome.extension)) {
+      window.location.href = '/login.html';
+      return;
+    }
+
+    if (savedUser) {
+      try {
+        const u = JSON.parse(savedUser);
+        setUser(u);
+        
+        // Fetch limits
+        const userId = u.username || u.id;
+        fetchUserDailyUsage(userId).then(data => {
+          const limit = u.daily_limit || 30;
+          setUsage({
+            used: data.used,
+            limit: limit,
+            remaining: Math.max(0, limit - data.used)
+          });
+        });
+      } catch (err) {}
     }
   }, []);
 
@@ -863,13 +883,23 @@ export function App() {
             </div>
 
             <p className="text-[10px] text-[#777777]">
-              Download Manager Local
+              {user ? `Olá, ${user.username}` : 'Download Manager Local'}
             </p>
           </div>
 
         </div>
 
-        <nav className="flex items-center gap-1 bg-[#0D0D0D] p-1 rounded-md border border-[#242424]">
+        <div className="flex flex-col items-end gap-1.5">
+          {user && (
+            <div className="flex items-center gap-1 text-[9px] text-[#A0A0A0] bg-[#141414] px-1.5 py-0.5 rounded border border-[#242424]" title="Seu limite diário no sistema">
+              ⬇️ Hoje:
+              <span className="font-bold text-[#F5F5F5]">{usage.used}</span>
+              <span className="text-[#555]">/</span>
+              <span className="text-[#E50914] font-semibold">{usage.limit}</span>
+            </div>
+          )}
+
+          <nav className="flex items-center gap-1 bg-[#0D0D0D] p-1 rounded-md border border-[#242424]">
 
           <button
             type="button"
@@ -934,6 +964,7 @@ export function App() {
           </button>
 
         </nav>
+        </div>
       </header>
 
       {/* MAIN */}
