@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7MGFC — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0a0f;
+            --bg-card: rgba(18,18,28,0.7);
+            --border: rgba(255,255,255,0.06);
+            --text: #f0f0f5;
+            --text-sec: #8b8b9e;
+            --text-muted: #5a5a6e;
+            --accent: #6366f1;
+            --accent-glow: rgba(99,102,241,0.12);
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --radius: 12px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 32px;
+        }
+        .header h1 { font-size: 20px; font-weight: 700; }
+        .header .user-badge {
+            display: flex; align-items: center; gap: 10px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 14px;
+        }
+        .header .avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: white;
+        }
+        .header .username { font-size: 13px; font-weight: 600; }
+        .btn-logout {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.15);
+            color: var(--error);
+            padding: 6px 12px; border-radius: 8px;
+            font-size: 12px; font-weight: 500;
+            cursor: pointer; font-family: inherit;
+        }
+        .btn-logout:hover { background: rgba(239,68,68,0.15); }
+
+        .cards { width: 100%; max-width: 700px; display: grid; gap: 16px; }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top:0; left:0; right:0; height:1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0.3;
+        }
+
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .card-title { font-size: 14px; font-weight: 600; color: var(--text-sec); display: flex; align-items: center; gap: 8px; }
+        
+        .usage-stats { display: flex; gap: 40px; margin-bottom: 24px; }
+        .stat { display: flex; flex-direction: column; gap: 4px; }
+        .stat-val { font-size: 32px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .stat-lbl { font-size: 12px; font-weight: 500; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .stat-val.accent { color: var(--accent); }
+        .stat-val.success { color: var(--success); }
+
+        .progress-bar { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden; position: relative; }
+        .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 1s ease; box-shadow: 0 0 10px var(--accent-glow); }
+        .progress-fill.danger { background: var(--error); box-shadow: 0 0 10px rgba(239,68,68,0.2); }
+
+        .info-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border); }
+        .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .info-label { color: var(--text-sec); font-size: 13px; font-weight: 500; }
+        .info-value { font-size: 13px; font-weight: 600; }
+        .info-value.warn { color: var(--warning); }
+        .info-value.danger { color: var(--error); }
+        
+        .extension-promo {
+            margin-top: 24px; background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.05));
+            border: 1px solid rgba(99,102,241,0.2); border-radius: var(--radius); padding: 20px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .promo-text h3 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .promo-text p { font-size: 13px; color: var(--text-sec); }
+        .btn-download {
+            background: var(--accent); color: white; text-decoration: none;
+            padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-download:hover { background: var(--accent-hover); box-shadow: 0 4px 16px var(--accent-glow); }
+
+        #loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); display: flex; align-items: center; justify-content: center;
+            z-index: 1000; transition: opacity 0.3s;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay"><div class="spinner"></div></div>
+
+    <div class="header">
+        <h1>Painel do Usuário</h1>
+        <div class="user-badge">
+            <div class="avatar" id="ui-avatar">?</div>
+            <span class="username" id="ui-username">...</span>
+            <button class="btn-logout" onclick="handleLogout()">Sair</button>
+        </div>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Uso Diário de Downloads
+                </div>
+                <div style="font-size: 12px; color: var(--text-sec); font-weight: 500;" id="ui-date">Hoje</div>
+            </div>
+
+            <div class="usage-stats">
+                <div class="stat">
+                    <span class="stat-val accent" id="ui-used">0</span>
+                    <span class="stat-lbl">Utilizados</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-val success" id="ui-remaining">0</span>
+                    <span class="stat-lbl">Restantes</span>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="ui-progress" style="width: 0%"></div>
+            </div>
+            <div style="text-align: right; font-size: 11px; color: var(--text-muted); margin-top: 8px; font-weight: 500;">
+                <span id="ui-percent">0</span>% do limite atingido
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    Detalhes da Conta
+                </div>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Status da Conta</span>
+                <span class="info-value" id="ui-status">Carregando...</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Limite Diário</span>
+                <span class="info-value"><span id="ui-limit">0</span> arquivos / dia</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Validade do Acesso</span>
+                <span class="info-value" id="ui-expires">Carregando...</span>
+            </div>
+        </div>
+
+        <div class="extension-promo">
+            <div class="promo-text">
+                <h3>Extensão 7MGFC Oficial</h3>
+                <p>Para baixar arquivos, instale ou abra a extensão no Chrome.</p>
+            </div>
+            <a href="7MGFC.zip" download class="btn-download">Baixar Extensão</a>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://crsqpssomhkpapqcoftr.supabase.co';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyc3Fwc3NvbWhrcGFwcWNvZnRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3MTM1NjAsImV4cCI6MjEwNjI4OTU2MH0.uzHwP3qK3ynWoITFZqm5I8LrrFeowYOFdy6Hsn--Y84';
+
+        async function supabaseRequest(endpoint) {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
+                headers: {
+                    'apikey': ANON_KEY,
+                    'Authorization': `Bearer ${ANON_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!res.ok) throw new Error('Falha na comunicação com o banco.');
+            return await res.json();
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('7mgfc_user');
+            window.location.href = '/';
+        }
+
+        async function initDashboard() {
+            try {
+                const savedUser = localStorage.getItem('7mgfc_user');
+                if (!savedUser) {
+                    window.location.href = '/';
+                    return;
+                }
+
+                const user = JSON.parse(savedUser);
+                
+                // Fetch fresh user data just in case
+                const usersData = await supabaseRequest(`users?username=eq.${encodeURIComponent(user.username)}&select=*`);
+                const freshUser = (usersData && usersData[0]) ? usersData[0] : user;
+
+                if (!freshUser.is_active) {
+                    alert('Sua conta foi desativada.');
+                    handleLogout();
+                    return;
+                }
+
+                // Update UI User
+                document.getElementById('ui-username').textContent = freshUser.username;
+                document.getElementById('ui-avatar').textContent = freshUser.username.substring(0,2).toUpperCase();
+
+                // Format dates
+                const todayStr = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'full' }).format(new Date());
+                document.getElementById('ui-date').textContent = todayStr.charAt(0).toUpperCase() + todayStr.slice(1);
+
+                // Expiration
+                const expiresAt = freshUser.expires_at ? new Date(freshUser.expires_at) : null;
+                const now = new Date();
+                
+                let statusHtml = '<span style="color:var(--success)">Ativo</span>';
+                let expiresHtml = 'Vitalício';
+
+                if (expiresAt) {
+                    if (expiresAt < now) {
+                        statusHtml = '<span style="color:var(--error)">Expirado</span>';
+                        expiresHtml = '<span style="color:var(--error)">Expirou em ' + expiresAt.toLocaleDateString('pt-BR') + '</span>';
+                    } else {
+                        const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+                        expiresHtml = expiresAt.toLocaleDateString('pt-BR') + ` <span style="color:var(--warning); font-size:11px; margin-left:6px;">(${daysLeft} dias restantes)</span>`;
+                    }
+                }
+
+                document.getElementById('ui-status').innerHTML = statusHtml;
+                document.getElementById('ui-expires').innerHTML = expiresHtml;
+                document.getElementById('ui-limit').textContent = freshUser.daily_limit;
+
+                // Get Usage
+                const yyyy = now.getFullYear();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                const dateKey = `${yyyy}-${mm}-${dd}`;
+
+                const usageData = await supabaseRequest(`downloads?user_id=eq.${encodeURIComponent(freshUser.username)}&download_date=eq.${dateKey}&select=id`, 'GET');
+                const used = usageData ? usageData.length : 0;
+                
+                const limit = freshUser.daily_limit || 30;
+                const remaining = Math.max(0, limit - used);
+                const percent = limit > 0 ? Math.min(100, Math.round((used / limit) * 100)) : 0;
+
+                document.getElementById('ui-used').textContent = used;
+                document.getElementById('ui-remaining').textContent = remaining;
+                document.getElementById('ui-percent').textContent = percent;
+                
+                const progressFill = document.getElementById('ui-progress');
+                progressFill.style.width = percent + '%';
+                if (percent >= 90) progressFill.classList.add('danger');
+
+                // Update local storage silently with fresh data (except password hash)
+                delete freshUser.password_hash;
+                localStorage.setItem('7mgfc_user', JSON.stringify(freshUser));
+
+                // Hide loader
+                document.getElementById('loading-overlay').style.opacity = '0';
+                setTimeout(() => document.getElementById('loading-overlay').style.display = 'none', 300);
+
+            } catch (err) {
+                console.error(err);
+                alert('Erro ao carregar dados do painel.');
+            }
+        }
+
+        initDashboard();
+    </script>
+</body>
+</html>
+

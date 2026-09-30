@@ -9,347 +9,1339 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
         :root {
-            --bg-primary: #0a0a0f; --bg-secondary: #111118; --bg-card: rgba(18,18,28,0.7);
-            --bg-input: rgba(255,255,255,0.04); --bg-hover: rgba(255,255,255,0.03);
-            --border: rgba(255,255,255,0.06); --border-subtle: rgba(255,255,255,0.04);
-            --text-primary: #f0f0f5; --text-secondary: #8b8b9e; --text-muted: #5a5a6e;
-            --accent: #6366f1; --accent-hover: #818cf8; --accent-glow: rgba(99,102,241,0.12);
-            --success: #10b981; --success-bg: rgba(16,185,129,0.08);
-            --error: #ef4444; --error-bg: rgba(239,68,68,0.08);
-            --warning: #f59e0b; --warning-bg: rgba(245,158,11,0.08);
-            --purple: #a855f7; --cyan: #06b6d4;
-            --radius: 12px; --radius-sm: 8px; --radius-lg: 16px;
-            --shadow: 0 4px 24px rgba(0,0,0,0.3); --transition: all 0.2s ease; --sidebar-w: 260px;
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-card: rgba(18, 18, 28, 0.7);
+            --bg-input: rgba(255, 255, 255, 0.04);
+            --bg-hover: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.06);
+            --border-subtle: rgba(255, 255, 255, 0.04);
+            --text-primary: #f0f0f5;
+            --text-secondary: #8b8b9e;
+            --text-muted: #5a5a6e;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.12);
+            --success: #10b981;
+            --success-bg: rgba(16, 185, 129, 0.08);
+            --error: #ef4444;
+            --error-bg: rgba(239, 68, 68, 0.08);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.08);
+            --purple: #a855f7;
+            --cyan: #06b6d4;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 16px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+            --transition: all 0.2s ease;
+            --sidebar-w: 260px;
         }
-        body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); min-height:100vh; display:flex; overflow-x:hidden; }
-        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:transparent; }
-        ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
 
-        /* SIDEBAR */
-        .sidebar { width:var(--sidebar-w); min-height:100vh; background:var(--bg-secondary); border-right:1px solid var(--border); display:flex; flex-direction:column; position:fixed; left:0; top:0; bottom:0; z-index:100; transition:transform .3s ease; }
-        .sidebar-header { padding:24px 20px; border-bottom:1px solid var(--border); }
-        .sidebar-logo { display:flex; align-items:center; gap:12px; }
-        .sidebar-logo-icon { width:40px; height:40px; background:linear-gradient(135deg,var(--accent),var(--purple)); border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px; color:white; }
-        .sidebar-logo-text { font-size:16px; font-weight:700; letter-spacing:-0.5px; }
-        .sidebar-logo-badge { font-size:10px; color:var(--accent); font-weight:500; display:block; margin-top:1px; }
-        .sidebar-nav { flex:1; padding:16px 12px; }
-        .nav-section-title { font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; padding:8px 12px; margin-top:8px; }
-        .nav-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--radius-sm); color:var(--text-secondary); font-size:13px; font-weight:500; cursor:pointer; transition:var(--transition); border:none; background:none; width:100%; text-align:left; }
-        .nav-item:hover { background:var(--bg-hover); color:var(--text-primary); }
-        .nav-item.active { background:var(--accent-glow); color:var(--accent-hover); }
-        .nav-item .nav-icon { font-size:16px; width:20px; text-align:center; }
-        .nav-item .nav-badge { margin-left:auto; background:var(--accent); color:white; padding:1px 7px; border-radius:10px; font-size:11px; font-weight:600; }
-        .sidebar-footer { padding:16px 12px; border-top:1px solid var(--border); }
-        .user-info { display:flex; align-items:center; gap:10px; padding:8px 12px; }
-        .user-avatar { width:34px; height:34px; background:linear-gradient(135deg,var(--accent),var(--purple)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:white; }
-        .user-name { font-size:13px; font-weight:600; }
-        .user-role { font-size:11px; color:var(--accent); }
-        .btn-logout { display:flex; align-items:center; gap:8px; padding:8px 12px; margin-top:8px; width:100%; border:none; background:var(--error-bg); color:var(--error); border-radius:var(--radius-sm); font-size:12px; font-weight:500; cursor:pointer; font-family:inherit; transition:var(--transition); }
-        .btn-logout:hover { background:rgba(239,68,68,0.15); }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
 
-        /* MAIN */
-        .main-content { flex:1; margin-left:var(--sidebar-w); min-height:100vh; }
-        .topbar { padding:20px 32px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; background:rgba(10,10,15,0.8); backdrop-filter:blur(20px); position:sticky; top:0; z-index:50; }
-        .topbar-title { font-size:18px; font-weight:700; letter-spacing:-0.5px; }
-        .topbar-subtitle { font-size:12px; color:var(--text-secondary); margin-top:2px; }
-        .content-area { padding:28px 32px; }
+        /* ==================== SIDEBAR ==================== */
+        .sidebar {
+            width: var(--sidebar-w);
+            min-height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
 
-        .page { display:none; animation:pageIn .3s ease; } .page.active { display:block; }
-        @keyframes pageIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border);
+        }
 
-        /* STATS */
-        .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:28px; }
-        .stat-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; position:relative; overflow:hidden; transition:var(--transition); }
-        .stat-card:hover { border-color:rgba(99,102,241,0.15); transform:translateY(-2px); }
-        .stat-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
-        .stat-card:nth-child(1)::before { background:linear-gradient(90deg,var(--accent),transparent); }
-        .stat-card:nth-child(2)::before { background:linear-gradient(90deg,var(--success),transparent); }
-        .stat-card:nth-child(3)::before { background:linear-gradient(90deg,var(--purple),transparent); }
-        .stat-card:nth-child(4)::before { background:linear-gradient(90deg,var(--cyan),transparent); }
-        .stat-card:nth-child(5)::before { background:linear-gradient(90deg,var(--warning),transparent); }
-        .stat-label { font-size:11px; font-weight:500; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
-        .stat-value { font-size:28px; font-weight:800; letter-spacing:-1px; }
-        .stat-icon { position:absolute; top:16px; right:16px; font-size:22px; opacity:0.3; }
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-        /* TABLE */
-        .table-container { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
-        .table-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
-        .table-title { font-size:14px; font-weight:600; }
-        .table-actions { display:flex; gap:8px; }
-        table { width:100%; border-collapse:collapse; }
-        th { text-align:left; padding:12px 16px; font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border); background:rgba(0,0,0,0.15); }
-        td { padding:12px 16px; font-size:13px; border-bottom:1px solid var(--border-subtle); color:var(--text-secondary); }
-        tr:hover td { background:var(--bg-hover); }
-        tr:last-child td { border-bottom:none; }
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            color: white;
+        }
 
-        /* BADGES */
-        .badge { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
-        .badge-active { background:var(--success-bg); color:var(--success); border:1px solid rgba(16,185,129,0.15); }
-        .badge-inactive { background:var(--error-bg); color:var(--error); border:1px solid rgba(239,68,68,0.15); }
-        .badge-used { background:var(--warning-bg); color:var(--warning); border:1px solid rgba(245,158,11,0.15); }
-        .badge-admin { background:rgba(168,85,247,0.08); color:var(--purple); border:1px solid rgba(168,85,247,0.15); }
-        .badge-user { background:rgba(6,182,212,0.08); color:var(--cyan); border:1px solid rgba(6,182,212,0.15); }
+        .sidebar-logo-text {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
 
-        /* BUTTONS */
-        .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:var(--radius-sm); font-size:12px; font-weight:500; font-family:inherit; cursor:pointer; border:none; transition:var(--transition); }
-        .btn-primary { background:var(--accent); color:white; } .btn-primary:hover { background:var(--accent-hover); box-shadow:0 4px 16px var(--accent-glow); }
-        .btn-danger { background:var(--error-bg); color:var(--error); border:1px solid rgba(239,68,68,0.15); } .btn-danger:hover { background:rgba(239,68,68,0.15); }
-        .btn-success { background:var(--success-bg); color:var(--success); border:1px solid rgba(16,185,129,0.15); } .btn-success:hover { background:rgba(16,185,129,0.15); }
-        .btn-ghost { background:var(--bg-input); color:var(--text-secondary); border:1px solid var(--border); } .btn-ghost:hover { background:var(--bg-hover); color:var(--text-primary); }
-        .btn-sm { padding:5px 10px; font-size:11px; }
-        .btn-icon { padding:6px 8px; }
+        .sidebar-logo-badge {
+            font-size: 10px;
+            color: var(--accent);
+            font-weight: 500;
+            display: block;
+            margin-top: 1px;
+        }
 
-        /* MODAL */
-        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); z-index:200; display:none; align-items:center; justify-content:center; }
-        .modal-overlay.show { display:flex; }
-        .modal { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-lg); width:100%; max-width:480px; max-height:90vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.5); animation:modalIn .3s ease; }
-        @keyframes modalIn { from{opacity:0;transform:scale(0.95) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
-        .modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
-        .modal-title { font-size:16px; font-weight:700; }
-        .modal-close { width:28px; height:28px; border:none; background:var(--bg-input); color:var(--text-secondary); border-radius:6px; cursor:pointer; font-size:14px; display:flex; align-items:center; justify-content:center; transition:var(--transition); }
-        .modal-close:hover { background:var(--error-bg); color:var(--error); }
-        .modal-body { padding:24px; }
-        .modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:8px; }
-        .form-row { margin-bottom:16px; }
-        .form-label { display:block; font-size:12px; font-weight:500; color:var(--text-secondary); margin-bottom:6px; }
-        .form-input, .form-select { width:100%; padding:10px 12px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-primary); font-size:13px; font-family:inherit; transition:var(--transition); outline:none; }
-        .form-input:focus, .form-select:focus { border-color:rgba(99,102,241,0.4); box-shadow:0 0 0 3px var(--accent-glow); }
-        .form-select { appearance:none; cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b8b9e' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; }
-        .form-select option { background:var(--bg-secondary); color:var(--text-primary); }
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px 12px;
+        }
 
-        .generated-keys { margin-top:16px; }
-        .key-item { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:6px; font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent-hover); letter-spacing:0.5px; }
-        .key-item .btn-copy { padding:4px 8px; font-size:11px; background:var(--accent-glow); color:var(--accent); border:none; border-radius:4px; cursor:pointer; font-family:'Inter',sans-serif; transition:var(--transition); }
-        .key-item .btn-copy:hover { background:var(--accent); color:white; }
+        .nav-section-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 12px;
+            margin-top: 8px;
+        }
 
-        .key-code { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent-hover); letter-spacing:0.5px; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
 
-        .toast-container { position:fixed; top:20px; right:20px; z-index:300; display:flex; flex-direction:column; gap:8px; }
-        .toast { padding:12px 18px; border-radius:var(--radius-sm); font-size:13px; font-weight:500; display:flex; align-items:center; gap:8px; box-shadow:var(--shadow); animation:toastIn .3s ease; min-width:280px; }
-        .toast-success { background:var(--success-bg); border:1px solid rgba(16,185,129,0.2); color:#6ee7b7; }
-        .toast-error { background:var(--error-bg); border:1px solid rgba(239,68,68,0.2); color:#fca5a5; }
-        @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
-        @keyframes toastOut { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(20px)} }
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
 
-        .empty-state { text-align:center; padding:48px 20px; color:var(--text-muted); }
-        .empty-state .empty-icon { font-size:40px; margin-bottom:12px; opacity:0.4; }
-        .empty-state p { font-size:13px; }
-        .loading-spinner { display:flex; align-items:center; justify-content:center; padding:40px; }
-        .loading-spinner::after { content:''; width:28px; height:28px; border:3px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
-        @keyframes spin { to{transform:rotate(360deg)} }
+        .nav-item.active {
+            background: var(--accent-glow);
+            color: var(--accent-hover);
+        }
 
-        .mobile-toggle { display:none; position:fixed; top:16px; left:16px; z-index:150; width:40px; height:40px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text-primary); font-size:18px; cursor:pointer; align-items:center; justify-content:center; }
-        @media(max-width:768px) {
-            .sidebar { transform:translateX(-100%); } .sidebar.open { transform:translateX(0); }
-            .main-content { margin-left:0; } .mobile-toggle { display:flex; }
-            .content-area { padding:20px 16px; } .topbar { padding:16px 20px; padding-left:60px; }
-            .stats-grid { grid-template-columns:repeat(2,1fr); }
+        .nav-item .nav-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item .nav-badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: white;
+            padding: 1px 7px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .sidebar-footer {
+            padding: 16px 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .user-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        .btn-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            margin-top: 8px;
+            width: 100%;
+            border: none;
+            background: var(--error-bg);
+            color: var(--error);
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        /* ==================== MAIN CONTENT ==================== */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .topbar-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .content-area {
+            padding: 28px 32px;
+        }
+
+        /* ==================== PAGES ==================== */
+        .page { display: none; animation: pageIn 0.3s ease; }
+        .page.active { display: block; }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== STATS CARDS ==================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: rgba(99, 102, 241, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+        }
+
+        .stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent), transparent); }
+        .stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--success), transparent); }
+        .stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--purple), transparent); }
+        .stat-card:nth-child(4)::before { background: linear-gradient(90deg, var(--cyan), transparent); }
+        .stat-card:nth-child(5)::before { background: linear-gradient(90deg, var(--warning), transparent); }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .stat-icon {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 22px;
+            opacity: 0.3;
+        }
+
+        /* ==================== TABLE ==================== */
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-title {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        td {
+            padding: 12px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background: var(--bg-hover);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ==================== BADGES ==================== */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-active {
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .badge-inactive {
+            background: var(--error-bg);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        .badge-used {
+            background: var(--warning-bg);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+        }
+
+        .badge-admin {
+            background: rgba(168, 85, 247, 0.08);
+            color: var(--purple);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+        }
+
+        .badge-user {
+            background: rgba(6, 182, 212, 0.08);
+            color: var(--cyan);
+            border: 1px solid rgba(6, 182, 212, 0.15);
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 4px 16px var(--accent-glow);
+        }
+
+        .btn-danger {
+            background: var(--error-bg);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .btn-success {
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+        }
+
+        .btn-success:hover {
+            background: rgba(16, 185, 129, 0.15);
+        }
+
+        .btn-ghost {
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-ghost:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 11px;
+        }
+
+        .btn-icon {
+            padding: 6px 8px;
+        }
+
+        /* ==================== MODAL ==================== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: modalOverlayIn 0.2s ease;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        @keyframes modalOverlayIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: var(--bg-input);
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--error-bg);
+            color: var(--error);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* Form inside modals */
+        .form-row {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 13px;
+            font-family: inherit;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-select {
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b8b9e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 32px;
+        }
+
+        .form-select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* ==================== KEY DISPLAY ==================== */
+        .generated-keys {
+            margin-top: 16px;
+        }
+
+        .key-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent-hover);
+            letter-spacing: 0.5px;
+        }
+
+        .key-item .btn-copy {
+            padding: 4px 8px;
+            font-size: 11px;
+            background: var(--accent-glow);
+            color: var(--accent);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+
+        .key-item .btn-copy:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* ==================== TOAST ==================== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast {
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+            animation: toastIn 0.3s ease;
+            min-width: 280px;
+        }
+
+        .toast-success {
+            background: var(--success-bg);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #6ee7b7;
+        }
+
+        .toast-error {
+            background: var(--error-bg);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(20px); }
+        }
+
+        /* ==================== EMPTY STATE ==================== */
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .empty-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+        }
+
+        /* ==================== LOADING ==================== */
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .loading-spinner::after {
+            content: '';
+            width: 28px;
+            height: 28px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ==================== KEY CODE CELL ==================== */
+        .key-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--accent-hover);
+            letter-spacing: 0.5px;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 150;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-toggle {
+                display: flex;
+            }
+            .content-area {
+                padding: 20px 16px;
+            }
+            .topbar {
+                padding: 16px 20px;
+                padding-left: 60px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            table {
+                font-size: 12px;
+            }
+            th, td {
+                padding: 8px 10px;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Duration display helper */
+        .duration-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
-    <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
 
+    <!-- Mobile Toggle -->
+    <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+
+    <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <div class="sidebar-logo-icon">7M</div>
-                <div><div class="sidebar-logo-text">7MGFC</div><span class="sidebar-logo-badge">Painel Admin</span></div>
+                <div>
+                    <div class="sidebar-logo-text">7MGFC</div>
+                    <span class="sidebar-logo-badge">Painel Admin</span>
+                </div>
             </div>
         </div>
+
         <nav class="sidebar-nav">
             <div class="nav-section-title">Principal</div>
-            <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><span class="nav-icon">📊</span>Dashboard</button>
+            <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+                <span class="nav-icon">📊</span>
+                Dashboard
+            </button>
+
             <div class="nav-section-title">Gerenciamento</div>
-            <button class="nav-item" data-page="users" onclick="showPage('users')"><span class="nav-icon">👤</span>Usuários<span class="nav-badge" id="users-count">0</span></button>
-            <button class="nav-item" data-page="keys" onclick="showPage('keys')"><span class="nav-icon">🔑</span>Chaves de Acesso<span class="nav-badge" id="keys-count">0</span></button>
+            <button class="nav-item" data-page="users" onclick="showPage('users')">
+                <span class="nav-icon">👤</span>
+                Usuários
+                <span class="nav-badge" id="users-count">0</span>
+            </button>
+            <button class="nav-item" data-page="keys" onclick="showPage('keys')">
+                <span class="nav-icon">🔑</span>
+                Chaves de Acesso
+                <span class="nav-badge" id="keys-count">0</span>
+            </button>
         </nav>
+
         <div class="sidebar-footer">
             <div class="user-info">
-                <div class="user-avatar" id="admin-avatar">AD</div>
-                <div><div class="user-name" id="admin-name">Admin</div><div class="user-role">Administrador</div></div>
+                <div class="user-avatar" id="ui-admin-avatar">AD</div>
+                <div>
+                    <div class="user-name" id="ui-admin-username">Admin</div>
+                    <div class="user-role">Administrador</div>
+                </div>
             </div>
-            <button class="btn-logout" onclick="handleLogout()"><span>🚪</span> Sair do sistema</button>
+            <button class="btn-logout" onclick="handleLogout()">
+                <span>🚪</span> Sair do sistema
+            </button>
         </div>
     </aside>
 
+    <!-- MAIN CONTENT -->
     <main class="main-content">
         <div class="topbar">
-            <div><h1 class="topbar-title" id="page-title">Dashboard</h1><p class="topbar-subtitle" id="page-subtitle">Visão geral do sistema</p></div>
+            <div>
+                <h1 class="topbar-title" id="page-title">Dashboard</h1>
+                <p class="topbar-subtitle" id="page-subtitle">Visão geral do sistema</p>
+            </div>
         </div>
+
         <div class="content-area">
-            <!-- DASHBOARD -->
+            <!-- ==================== DASHBOARD ==================== -->
             <div class="page active" id="page-dashboard">
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-icon">👤</div><div class="stat-label">Total Usuários</div><div class="stat-value" id="stat-total-users">—</div></div>
-                    <div class="stat-card"><div class="stat-icon">✅</div><div class="stat-label">Usuários Ativos</div><div class="stat-value" id="stat-active-users">—</div></div>
-                    <div class="stat-card"><div class="stat-icon">🔑</div><div class="stat-label">Total de Keys</div><div class="stat-value" id="stat-total-keys">—</div></div>
-                    <div class="stat-card"><div class="stat-icon">📦</div><div class="stat-label">Keys Disponíveis</div><div class="stat-value" id="stat-available-keys">—</div></div>
-                    <div class="stat-card"><div class="stat-icon">📥</div><div class="stat-label">Downloads Hoje</div><div class="stat-value" id="stat-today-downloads">—</div></div>
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👤</div>
+                        <div class="stat-label">Total Usuários</div>
+                        <div class="stat-value" id="stat-total-users">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-label">Usuários Ativos</div>
+                        <div class="stat-value" id="stat-active-users">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔑</div>
+                        <div class="stat-label">Total de Keys</div>
+                        <div class="stat-value" id="stat-total-keys">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-label">Keys Disponíveis</div>
+                        <div class="stat-value" id="stat-available-keys">—</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📥</div>
+                        <div class="stat-label">Downloads Hoje</div>
+                        <div class="stat-value" id="stat-today-downloads">—</div>
+                    </div>
                 </div>
             </div>
-            <!-- USERS -->
+
+            <!-- ==================== USERS PAGE ==================== -->
             <div class="page" id="page-users">
                 <div class="table-container">
-                    <div class="table-header"><div class="table-title">Lista de Usuários</div>
-                        <div class="table-actions"><button class="btn btn-ghost btn-sm" onclick="loadUsers()">🔄 Atualizar</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-create-user')">➕ Novo Usuário</button></div>
-                    </div><div id="users-table-wrapper"><div class="loading-spinner"></div></div>
+                    <div class="table-header">
+                        <div class="table-title">Lista de Usuários</div>
+                        <div class="table-actions">
+                            <button class="btn btn-ghost btn-sm" onclick="loadUsers()">🔄 Atualizar</button>
+                            <button class="btn btn-primary btn-sm" onclick="openCreateUserModal()">➕ Novo Usuário</button>
+                        </div>
+                    </div>
+                    <div id="users-table-wrapper">
+                        <div class="loading-spinner"></div>
+                    </div>
                 </div>
             </div>
-            <!-- KEYS -->
+
+            <!-- ==================== KEYS PAGE ==================== -->
             <div class="page" id="page-keys">
                 <div class="table-container">
-                    <div class="table-header"><div class="table-title">Chaves de Acesso</div>
-                        <div class="table-actions"><button class="btn btn-ghost btn-sm" onclick="loadKeys()">🔄 Atualizar</button><button class="btn btn-primary btn-sm" onclick="openModal('modal-generate-keys')">🔑 Gerar Keys</button></div>
-                    </div><div id="keys-table-wrapper"><div class="loading-spinner"></div></div>
+                    <div class="table-header">
+                        <div class="table-title">Chaves de Acesso</div>
+                        <div class="table-actions">
+                            <button class="btn btn-ghost btn-sm" onclick="loadKeys()">🔄 Atualizar</button>
+                            <button class="btn btn-primary btn-sm" onclick="openGenerateKeysModal()">🔑 Gerar Keys</button>
+                        </div>
+                    </div>
+                    <div id="keys-table-wrapper">
+                        <div class="loading-spinner"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toast-container"></div>
 
-    <!-- Modal: Create User -->
+    <!-- MODAL: Create User -->
     <div class="modal-overlay" id="modal-create-user">
         <div class="modal">
-            <div class="modal-header"><div class="modal-title">➕ Novo Usuário</div><button class="modal-close" onclick="closeModal('modal-create-user')">✕</button></div>
-            <div class="modal-body">
-                <div class="form-row"><label class="form-label">Nome de Usuário</label><input type="text" class="form-input" id="new-user-username" placeholder="ex: joao_silva"></div>
-                <div class="form-row"><label class="form-label">Senha</label><input type="password" class="form-input" id="new-user-password" placeholder="Mínimo 6 caracteres"></div>
-                <div class="form-row"><label class="form-label">Função</label><select class="form-select" id="new-user-role"><option value="user">Usuário</option><option value="admin">Administrador</option></select></div>
-                <div class="form-row"><label class="form-label">Limite Diário</label><input type="number" class="form-input" id="new-user-limit" value="30" min="1" max="999"></div>
+            <div class="modal-header">
+                <div class="modal-title">➕ Novo Usuário</div>
+                <button class="modal-close" onclick="closeModal('modal-create-user')">✕</button>
             </div>
-            <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-create-user')">Cancelar</button><button class="btn btn-primary" onclick="createUser()">Criar Usuário</button></div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <label class="form-label">Nome de Usuário</label>
+                    <input type="text" class="form-input" id="new-user-username" placeholder="ex: joao_silva">
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Senha</label>
+                    <input type="password" class="form-input" id="new-user-password" placeholder="Mínimo 6 caracteres">
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Função</label>
+                    <select class="form-select" id="new-user-role">
+                        <option value="user">Usuário</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Limite Diário</label>
+                    <input type="number" class="form-input" id="new-user-limit" value="30" min="1" max="999">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-create-user')">Cancelar</button>
+                <button class="btn btn-primary" onclick="createUser()">Criar Usuário</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal: Edit User -->
+    
+    <!-- MODAL: Edit User -->
     <div class="modal-overlay" id="modal-edit-user">
         <div class="modal">
-            <div class="modal-header"><div class="modal-title">✏️ Editar Usuário</div><button class="modal-close" onclick="closeModal('modal-edit-user')">✕</button></div>
+            <div class="modal-header">
+                <div class="modal-title">✏️ Editar Usuário</div>
+                <button class="modal-close" onclick="closeModal('modal-edit-user')">✕</button>
+            </div>
             <div class="modal-body">
                 <input type="hidden" id="edit-user-id">
-                <input type="hidden" id="edit-user-old-username">
-                <div class="form-row"><label class="form-label">Nome de Usuário</label><input type="text" class="form-input" id="edit-user-username" placeholder="ex: joao_silva"></div>
-                <div class="form-row"><label class="form-label">Nova Senha (deixe em branco para não alterar)</label><input type="password" class="form-input" id="edit-user-password" placeholder="Mínimo 6 caracteres"></div>
-                <div class="form-row"><label class="form-label">Função</label><select class="form-select" id="edit-user-role"><option value="user">Usuário</option><option value="admin">Administrador</option></select></div>
-                <div class="form-row"><label class="form-label">Limite Diário</label><input type="number" class="form-input" id="edit-user-limit" min="1" max="999"></div>
+                <div class="form-row">
+                    <label class="form-label">Nome de Usuário</label>
+                    <input type="text" class="form-input" id="edit-user-username" placeholder="ex: joao_silva">
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Nova Senha (deixe em branco para manter)</label>
+                    <input type="password" class="form-input" id="edit-user-password" placeholder="Mínimo 6 caracteres">
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Função</label>
+                    <select class="form-select" id="edit-user-role">
+                        <option value="user">Usuário</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Limite Diário</label>
+                    <input type="number" class="form-input" id="edit-user-limit" min="1" max="999">
+                </div>
             </div>
-            <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-edit-user')">Cancelar</button><button class="btn btn-primary" onclick="saveEditUser()">Salvar</button></div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-edit-user')">Cancelar</button>
+                <button class="btn btn-primary" onclick="editUser()">Salvar Alterações</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal: Generate Keys -->
+    <!-- MODAL: Generate Keys -->
     <div class="modal-overlay" id="modal-generate-keys">
         <div class="modal">
-            <div class="modal-header"><div class="modal-title">🔑 Gerar Chaves de Acesso</div><button class="modal-close" onclick="closeModal('modal-generate-keys')">✕</button></div>
+            <div class="modal-header">
+                <div class="modal-title">🔑 Gerar Chaves de Acesso</div>
+                <button class="modal-close" onclick="closeModal('modal-generate-keys')">✕</button>
+            </div>
             <div class="modal-body">
-                <div class="form-row"><label class="form-label">Quantidade</label><input type="number" class="form-input" id="gen-quantity" value="5" min="1" max="50"></div>
-                <div class="form-row"><label class="form-label">Duração de Validade</label>
+                <div class="form-row">
+                    <label class="form-label">Quantidade</label>
+                    <input type="number" class="form-input" id="gen-quantity" value="5" min="1" max="50">
+                </div>
+                <div class="form-row">
+                    <label class="form-label">Duração de Validade</label>
                     <select class="form-select" id="gen-duration">
-                        <option value="1">1 hora</option><option value="6">6 horas</option><option value="12">12 horas</option>
-                        <option value="24">1 dia</option><option value="72">3 dias</option><option value="168">7 dias</option>
-                        <option value="336">14 dias</option><option value="720" selected>30 dias</option>
-                        <option value="2160">90 dias</option><option value="4320">180 dias</option><option value="8760">1 ano</option>
+                        <option value="1">1 hora</option>
+                        <option value="6">6 horas</option>
+                        <option value="12">12 horas</option>
+                        <option value="24">1 dia</option>
+                        <option value="72">3 dias</option>
+                        <option value="168">7 dias (1 semana)</option>
+                        <option value="336">14 dias (2 semanas)</option>
+                        <option value="720" selected>30 dias (1 mês)</option>
+                        <option value="2160">90 dias (3 meses)</option>
+                        <option value="4320">180 dias (6 meses)</option>
+                        <option value="8760">365 dias (1 ano)</option>
                         <option value="0">Sem expiração</option>
                     </select>
                 </div>
                 <div id="generated-keys-output"></div>
             </div>
-            <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-generate-keys')">Fechar</button><button class="btn btn-primary" id="btn-generate" onclick="generateKeys()">Gerar Chaves</button></div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeModal('modal-generate-keys')">Fechar</button>
+                <button class="btn btn-primary" id="btn-generate" onclick="generateKeys()">Gerar Chaves</button>
+            </div>
         </div>
     </div>
 
+    <!-- bcryptjs CDN for client-side password hashing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
     <script>
         const SUPABASE_URL = 'https://crsqpssomhkpapqcoftr.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyc3Fwc3NvbWhrcGFwcWNvZnRyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MDcxMzU2MCwiZXhwIjoyMTA2Mjg5NTYwfQ.1gVKJCmaO2vZ_VJ7hgY8ZGuF5AhwAgEuoi5Y8d_itjI';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyc3Fwc3NvbWhrcGFwcWNvZnRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3MTM1NjAsImV4cCI6MjEwNjI4OTU2MH0.uzHwP3qK3ynWoITFZqm5I8LrrFeowYOFdy6Hsn--Y84';
 
-        // Auth check
-        const currentUser = JSON.parse(localStorage.getItem('7mgfc_user') || 'null');
-        if (!currentUser || currentUser.role !== 'admin') { window.location.href = '/login.html'; }
-        document.getElementById('admin-name').textContent = currentUser?.username || 'Admin';
-        document.getElementById('admin-avatar').textContent = (currentUser?.username || 'AD').slice(0,2).toUpperCase();
-
-        async function sb(endpoint, method = 'GET', body = null, prefer = '') {
-            const h = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Accept': 'application/json' };
-            if (prefer) h['Prefer'] = prefer;
-            const o = { method, headers: h };
-            if (body) o.body = JSON.stringify(body);
-            const r = await fetch(SUPABASE_URL + '/rest/v1/' + endpoint, o);
-            return { ok: r.ok, status: r.status, data: await r.json().catch(() => null) };
+        async function supabaseRequest(endpoint, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: {
+                    'apikey': ANON_KEY,
+                    'Authorization': `Bearer ${ANON_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                }
+            };
+            if (body) options.body = JSON.stringify(body);
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, options);
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => null);
+                throw new Error((errorData && errorData.message) || `Erro HTTP ${res.status}`);
+            }
+            if (method !== 'DELETE') {
+                 const text = await res.text();
+                 return text ? JSON.parse(text) : {};
+            }
+            return {};
         }
 
+        let currentPage = 'dashboard';
+
+        // Check Auth
+        const savedUser = localStorage.getItem('7mgfc_user');
+        if (!savedUser) {
+            window.location.href = '/';
+        } else {
+            const user = JSON.parse(savedUser);
+            if (user.role !== 'admin') {
+                window.location.href = '/dashboard.html';
+            } else {
+                document.getElementById('ui-admin-username').textContent = user.username;
+                document.getElementById('ui-admin-avatar').textContent = user.username.substring(0,2).toUpperCase();
+            }
+        }
+
+        // ==================== NAVIGATION ====================
         function showPage(page) {
+            currentPage = page;
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
             document.getElementById('page-' + page).classList.add('active');
             document.querySelector(`.nav-item[data-page="${page}"]`).classList.add('active');
-            const t = { dashboard:['Dashboard','Visão geral do sistema'], users:['Usuários','Gerenciar contas'], keys:['Chaves de Acesso','Gerenciar keys'] };
-            document.getElementById('page-title').textContent = t[page][0];
-            document.getElementById('page-subtitle').textContent = t[page][1];
+
+            const titles = {
+                dashboard: ['Dashboard', 'Visão geral do sistema'],
+                users: ['Usuários', 'Gerenciar contas de usuários'],
+                keys: ['Chaves de Acesso', 'Gerenciar keys de ativação']
+            };
+
+            document.getElementById('page-title').textContent = titles[page][0];
+            document.getElementById('page-subtitle').textContent = titles[page][1];
+
             if (page === 'dashboard') loadDashboard();
             if (page === 'users') loadUsers();
             if (page === 'keys') loadKeys();
+
+            // Close mobile sidebar
             document.getElementById('sidebar').classList.remove('open');
         }
 
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // ==================== API HELPER ====================
+        async function apiCall(action, data = null) {
+            try {
+                if (action === 'logout') {
+                    localStorage.removeItem('7mgfc_user');
+                    return { success: true };
+                }
+                if (action === 'dashboard_stats') {
+                    const users = await supabaseRequest('users?select=id,is_active');
+                    const keys = await supabaseRequest('access_keys?select=id,used');
+                    const dateKey = new Date().toISOString().split('T')[0];
+                    const downloads = await supabaseRequest(`downloads?download_date=eq.${dateKey}&select=id`);
+                    return {
+                        success: true,
+                        stats: {
+                            total_users: users.length,
+                            active_users: users.filter(u => u.is_active !== false).length,
+                            total_keys: keys.length,
+                            available_keys: keys.filter(k => !k.used).length,
+                            today_downloads: downloads.length
+                        }
+                    };
+                }
+                if (action === 'list_users') {
+                    const users = await supabaseRequest('users?select=*&order=created_at.desc');
+                    return { success: true, users };
+                }
+                if (action === 'toggle_user') {
+                    await supabaseRequest(`users?id=eq.${data.user_id}`, 'PATCH', { is_active: data.is_active });
+                    return { success: true, message: 'Status do usuário alterado.' };
+                }
+                if (action === 'delete_user') {
+                    await supabaseRequest(`users?id=eq.${data.user_id}`, 'DELETE');
+                    return { success: true, message: 'Usuário excluído com sucesso.' };
+                }
+                if (action === 'create_user') {
+                    const existing = await supabaseRequest(`users?username=eq.${encodeURIComponent(data.username)}`);
+                    if (existing && existing.length > 0) return { success: false, message: 'Nome de usuário já existe.' };
+                    
+                    const hash = dcodeIO.bcrypt.hashSync(data.password, 10);
+                    await supabaseRequest('users', 'POST', {
+                        username: data.username,
+                        password_hash: hash,
+                        role: data.role,
+                        daily_limit: data.daily_limit
+                    });
+                    return { success: true, message: 'Usuário criado com sucesso.' };
+                }
+                
+                if (action === 'edit_user') {
+                    const updateData = {
+                        username: data.username,
+                        role: data.role,
+                        daily_limit: data.daily_limit
+                    };
+                    if (data.password && data.password.length >= 6) {
+                        updateData.password_hash = dcodeIO.bcrypt.hashSync(data.password, 10);
+                    }
+                    
+                    // check if new username exists in another user
+                    const existing = await supabaseRequest(`users?username=eq.${encodeURIComponent(data.username)}&id=neq.${data.id}`);
+                    if (existing && existing.length > 0) return { success: false, message: 'Este nome de usuário já está em uso.' };
+
+                    await supabaseRequest(`users?id=eq.${data.id}`, 'PATCH', updateData);
+                    return { success: true, message: 'Usuário atualizado com sucesso.' };
+                }
+
+                if (action === 'list_keys') {
+                    const keys = await supabaseRequest('access_keys?select=*&order=created_at.desc');
+                    return { success: true, keys };
+                }
+                if (action === 'toggle_key') {
+                    await supabaseRequest(`access_keys?id=eq.${data.key_id}`, 'PATCH', { is_active: data.is_active });
+                    return { success: true, message: 'Status da chave alterado.' };
+                }
+                if (action === 'delete_key') {
+                    await supabaseRequest(`access_keys?id=eq.${data.key_id}`, 'DELETE');
+                    return { success: true, message: 'Chave excluída com sucesso.' };
+                }
+                if (action === 'generate_keys') {
+                    const generated = [];
+                    for(let i=0; i<data.quantity; i++) {
+                        const segments = [];
+                        for(let j=0; j<4; j++) {
+                            segments.push(Math.random().toString(36).substring(2, 6).toUpperCase());
+                        }
+                        const key = '7MGFC-' + segments.join('-');
+                        generated.push(key);
+                        await supabaseRequest('access_keys', 'POST', {
+                            key_code: key,
+                            duration_hours: data.duration_hours,
+                            valid_days: data.duration_hours > 0 ? data.duration_hours / 24 : null
+                        });
+                    }
+                    return { success: true, message: 'Chaves geradas com sucesso.', keys: generated };
+                }
+            } catch (err) {
+                return { success: false, message: 'Erro de conexão: ' + err.message };
+            }
+        }
+
+        // ==================== DASHBOARD ====================
         async function loadDashboard() {
-            const [u, au, k, ak] = await Promise.all([
-                sb('users?select=id'), sb('users?is_active=eq.true&select=id'),
-                sb('access_keys?select=id'), sb('access_keys?is_used=eq.false&is_active=eq.true&select=id')
-            ]);
-            document.getElementById('stat-total-users').textContent = u.ok ? u.data.length : 0;
-            document.getElementById('stat-active-users').textContent = au.ok ? au.data.length : 0;
-            document.getElementById('stat-total-keys').textContent = k.ok ? k.data.length : 0;
-            document.getElementById('stat-available-keys').textContent = ak.ok ? ak.data.length : 0;
-            const today = new Date().toISOString().slice(0,10);
-            const dl = await sb('daily_limits?download_date=eq.' + today + '&select=downloads_used');
-            let total = 0;
-            if (dl.ok && dl.data) dl.data.forEach(r => total += r.downloads_used || 0);
-            document.getElementById('stat-today-downloads').textContent = total;
+            const res = await apiCall('dashboard_stats');
+            if (res.success) {
+                const s = res.stats;
+                document.getElementById('stat-total-users').textContent = s.total_users;
+                document.getElementById('stat-active-users').textContent = s.active_users;
+                document.getElementById('stat-total-keys').textContent = s.total_keys;
+                document.getElementById('stat-available-keys').textContent = s.available_keys;
+                document.getElementById('stat-today-downloads').textContent = s.today_downloads;
+            }
         }
 
+        // ==================== USERS ====================
         async function loadUsers() {
-            const w = document.getElementById('users-table-wrapper');
-            w.innerHTML = '<div class="loading-spinner"></div>';
-            const res = await sb('users?select=id,username,email,daily_limit,is_active,role,access_key_used,expires_at,last_login,created_at&order=created_at.desc');
-            if (!res.ok) { w.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erro ao carregar</p></div>'; return; }
-            const users = res.data || [];
+            const wrapper = document.getElementById('users-table-wrapper');
+            wrapper.innerHTML = '<div class="loading-spinner"></div>';
+
+            const res = await apiCall('list_users');
+            if (!res.success) {
+                wrapper.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>' + res.message + '</p></div>';
+                return;
+            }
+
+            const users = res.users || [];
             document.getElementById('users-count').textContent = users.length;
-            if (!users.length) { w.innerHTML = '<div class="empty-state"><div class="empty-icon">👤</div><p>Nenhum usuário</p></div>'; return; }
-            let h = '<table><thead><tr><th>Usuário</th><th>Função</th><th>Limite</th><th>Status</th><th>Expira</th><th>Criado</th><th>Ações</th></tr></thead><tbody>';
+
+            if (users.length === 0) {
+                wrapper.innerHTML = '<div class="empty-state"><div class="empty-icon">👤</div><p>Nenhum usuário cadastrado.</p></div>';
+                return;
+            }
+
+            let html = `<table>
+                <thead><tr>
+                    <th>Usuário</th>
+                    <th>Função</th>
+                    <th>Limite</th>
+                    <th>Status</th>
+                    <th>Expira em</th>
+                    <th>Criado em</th>
+                    <th>Ações</th>
+                </tr></thead><tbody>`;
+
             users.forEach(u => {
-                const a = u.is_active !== false;
-                h += `<tr><td><strong style="color:var(--text-primary)">${esc(u.username)}</strong></td>
-                <td>${u.role==='admin'?'<span class="badge badge-admin">Admin</span>':'<span class="badge badge-user">User</span>'}</td>
-                <td>${u.daily_limit||30}</td>
-                <td>${a?'<span class="badge badge-active">● Ativo</span>':'<span class="badge badge-inactive">● Inativo</span>'}</td>
-                <td>${u.expires_at?new Date(u.expires_at).toLocaleDateString('pt-BR'):'—'}</td>
-                <td>${u.created_at?new Date(u.created_at).toLocaleDateString('pt-BR'):'—'}</td>
-                <td>
-                <button class="btn btn-sm btn-ghost btn-icon" onclick="openEditUser(${u.id}, '${esc(u.username)}', '${u.role}', ${u.daily_limit||30})" title="Editar">✏️</button>
-                <button class="btn btn-sm ${a?'btn-danger':'btn-success'}" onclick="toggleUser(${u.id},${!a})" title="${a?'Desativar':'Ativar'}">${a?'🚫':'✅'}</button>
-                <button class="btn btn-sm btn-danger btn-icon" onclick="deleteUser(${u.id},'${esc(u.username)}')" title="Excluir">🗑️</button>
-                </td></tr>`;
+                const isActive = u.is_active !== false;
+                const roleBadge = u.role === 'admin' ? '<span class="badge badge-admin">Admin</span>' : '<span class="badge badge-user">User</span>';
+                const statusBadge = isActive ? '<span class="badge badge-active">● Ativo</span>' : '<span class="badge badge-inactive">● Inativo</span>';
+                const expiresAt = u.expires_at ? new Date(u.expires_at).toLocaleDateString('pt-BR') : '—';
+                const createdAt = u.created_at ? new Date(u.created_at).toLocaleDateString('pt-BR') : '—';
+
+                html += `<tr>
+                    <td><strong style="color:var(--text-primary)">${escHtml(u.username)}</strong></td>
+                    <td>${roleBadge}</td>
+                    <td>${u.daily_limit || 30}</td>
+                    <td>${statusBadge}</td>
+                    <td>${expiresAt}</td>
+                    <td>${createdAt}</td>
+                    <td>
+                        <button class="btn btn-sm ${isActive ? 'btn-danger' : 'btn-success'}" onclick="toggleUser('${u.id}', ${!isActive})">
+                            ${isActive ? '🚫 Desativar' : '✅ Ativar'}
+                        </button>
+                        <button class="btn btn-sm btn-primary" style="background:var(--accent)" onclick="openEditUserModal('${u.id}', '${escHtml(u.username)}', '${u.role}', ${u.daily_limit || 30})">✏️ Editar</button>
+                        <button class="btn btn-sm btn-danger btn-icon" onclick="deleteUser('${u.id}', '${escHtml(u.username)}')" title="Excluir">🗑️</button>
+                    </td>
+                </tr>`;
             });
-            h += '</tbody></table>';
-            w.innerHTML = h;
+
+            html += '</tbody></table>';
+            wrapper.innerHTML = html;
         }
 
-        async function toggleUser(id, active) {
-            const r = await sb('users?id=eq.' + id, 'PATCH', { is_active: active }, 'return=minimal');
-            showToast(r.ok ? 'Status atualizado!' : 'Erro', r.ok ? 'success' : 'error');
-            if (r.ok) loadUsers();
+        async function toggleUser(userId, newStatus) {
+            const res = await apiCall('toggle_user', { user_id: userId, is_active: newStatus });
+            showToast(res.message, res.success ? 'success' : 'error');
+            if (res.success) loadUsers();
         }
 
-        async function deleteUser(id, name) {
-            if (!confirm(`Excluir "${name}"?`)) return;
-            if (currentUser.id == id) { showToast('Não pode excluir a si mesmo', 'error'); return; }
-            const r = await sb('users?id=eq.' + id, 'DELETE');
-            showToast(r.ok ? 'Excluído!' : 'Erro', r.ok ? 'success' : 'error');
-            if (r.ok) loadUsers();
+        async function deleteUser(userId, username) {
+            if (!confirm(`Tem certeza que deseja excluir o usuário "${username}"?`)) return;
+            const res = await apiCall('delete_user', { user_id: userId });
+            showToast(res.message, res.success ? 'success' : 'error');
+            if (res.success) loadUsers();
+        }
+
+        
+        function openEditUserModal(id, username, role, limit) {
+            document.getElementById('edit-user-id').value = id;
+            document.getElementById('edit-user-username').value = username;
+            document.getElementById('edit-user-password').value = '';
+            document.getElementById('edit-user-role').value = role;
+            document.getElementById('edit-user-limit').value = limit;
+            openModal('modal-edit-user');
+        }
+
+        async function editUser() {
+            const id = document.getElementById('edit-user-id').value;
+            const username = document.getElementById('edit-user-username').value.trim();
+            const password = document.getElementById('edit-user-password').value;
+            const role = document.getElementById('edit-user-role').value;
+            const daily_limit = parseInt(document.getElementById('edit-user-limit').value);
+
+            if (!username) {
+                showToast('O nome de usuário não pode ficar vazio.', 'error');
+                return;
+            }
+
+            const res = await apiCall('edit_user', { id, username, password, role, daily_limit });
+            showToast(res.message, res.success ? 'success' : 'error');
+            if (res.success) {
+                closeModal('modal-edit-user');
+                loadUsers();
+            }
+        }
+
+        function openCreateUserModal() {
+            document.getElementById('new-user-username').value = '';
+            document.getElementById('new-user-password').value = '';
+            document.getElementById('new-user-role').value = 'user';
+            document.getElementById('new-user-limit').value = '30';
+            openModal('modal-create-user');
         }
 
         async function createUser() {
@@ -357,151 +1349,208 @@
             const password = document.getElementById('new-user-password').value;
             const role = document.getElementById('new-user-role').value;
             const daily_limit = parseInt(document.getElementById('new-user-limit').value);
-            if (!username || !password) { showToast('Preencha todos os campos', 'error'); return; }
-            const salt = dcodeIO.bcrypt.genSaltSync(10);
-            const hash = dcodeIO.bcrypt.hashSync(password, salt);
-            const r = await sb('users', 'POST', [{ username, password_hash: hash, daily_limit, is_active: true, role }], 'return=representation');
-            showToast(r.ok ? 'Criado!' : 'Erro: ' + (r.data?.message||''), r.ok ? 'success' : 'error');
-            if (r.ok) { closeModal('modal-create-user'); loadUsers(); }
-        }
 
-        function openEditUser(id, username, role, limit) {
-            document.getElementById('edit-user-id').value = id;
-            document.getElementById('edit-user-old-username').value = username;
-            document.getElementById('edit-user-username').value = username;
-            document.getElementById('edit-user-role').value = role;
-            document.getElementById('edit-user-limit').value = limit;
-            document.getElementById('edit-user-password').value = '';
-            openModal('modal-edit-user');
-        }
-
-        async function saveEditUser() {
-            const id = document.getElementById('edit-user-id').value;
-            const oldUsername = document.getElementById('edit-user-old-username').value;
-            const username = document.getElementById('edit-user-username').value.trim();
-            const role = document.getElementById('edit-user-role').value;
-            const daily_limit = parseInt(document.getElementById('edit-user-limit').value);
-            const password = document.getElementById('edit-user-password').value;
-
-            if (!username) { showToast('Nome de usuário não pode ficar vazio', 'error'); return; }
-
-            // Verifica se o novo username já existe
-            if (username !== oldUsername) {
-                const existing = await sb('users?username=eq.' + encodeURIComponent(username) + '&select=id');
-                if (existing.ok && existing.data && existing.data.length > 0) {
-                    showToast('Este nome de usuário já está em uso.', 'error'); return;
-                }
+            if (!username || !password) {
+                showToast('Preencha todos os campos obrigatórios.', 'error');
+                return;
             }
 
-            const updateData = { username, role, daily_limit };
-            
-            if (password.length > 0) {
-                if (password.length < 6) { showToast('Senha deve ter no mínimo 6 caracteres', 'error'); return; }
-                const salt = dcodeIO.bcrypt.genSaltSync(10);
-                updateData.password_hash = dcodeIO.bcrypt.hashSync(password, salt);
+            const res = await apiCall('create_user', { username, password, role, daily_limit });
+            showToast(res.message, res.success ? 'success' : 'error');
+            if (res.success) {
+                closeModal('modal-create-user');
+                loadUsers();
             }
-
-            const r = await sb('users?id=eq.' + id, 'PATCH', updateData, 'return=minimal');
-            
-            if (r.ok && username !== oldUsername) {
-                // Atualiza referências em outras tabelas para não quebrar o histórico/limites
-                sb('daily_limits?user_id=eq.' + encodeURIComponent(oldUsername), 'PATCH', { user_id: username }, 'return=minimal');
-                sb('downloads_history?user_id=eq.' + encodeURIComponent(oldUsername), 'PATCH', { user_id: username }, 'return=minimal');
-                sb('access_keys?used_by=eq.' + encodeURIComponent(oldUsername), 'PATCH', { used_by: username }, 'return=minimal');
-            }
-
-            showToast(r.ok ? 'Atualizado com sucesso!' : 'Erro ao atualizar', r.ok ? 'success' : 'error');
-            if (r.ok) { closeModal('modal-edit-user'); loadUsers(); }
         }
 
+        // ==================== KEYS ====================
         async function loadKeys() {
-            const w = document.getElementById('keys-table-wrapper');
-            w.innerHTML = '<div class="loading-spinner"></div>';
-            const res = await sb('access_keys?select=*&order=created_at.desc');
-            if (!res.ok) { w.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erro ao carregar</p></div>'; return; }
-            const keys = res.data || [];
+            const wrapper = document.getElementById('keys-table-wrapper');
+            wrapper.innerHTML = '<div class="loading-spinner"></div>';
+
+            const res = await apiCall('list_keys');
+            if (!res.success) {
+                wrapper.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>' + res.message + '</p></div>';
+                return;
+            }
+
+            const keys = res.keys || [];
             document.getElementById('keys-count').textContent = keys.length;
-            if (!keys.length) { w.innerHTML = '<div class="empty-state"><div class="empty-icon">🔑</div><p>Nenhuma chave. Clique "Gerar Keys".</p></div>'; return; }
-            let h = '<table><thead><tr><th>Chave</th><th>Duração</th><th>Status</th><th>Usado por</th><th>Criada</th><th>Ações</th></tr></thead><tbody>';
+
+            if (keys.length === 0) {
+                wrapper.innerHTML = '<div class="empty-state"><div class="empty-icon">🔑</div><p>Nenhuma chave gerada. Clique em "Gerar Keys" para começar.</p></div>';
+                return;
+            }
+
+            let html = `<table>
+                <thead><tr>
+                    <th>Chave</th>
+                    <th>Duração</th>
+                    <th>Status</th>
+                    <th>Usado por</th>
+                    <th>Criada em</th>
+                    <th>Ações</th>
+                </tr></thead><tbody>`;
+
             keys.forEach(k => {
-                let badge;
-                if (k.is_used) badge = '<span class="badge badge-used">● Usada</span>';
-                else if (k.is_active) badge = '<span class="badge badge-active">● Disponível</span>';
-                else badge = '<span class="badge badge-inactive">● Desativada</span>';
-                h += `<tr><td><span class="key-code">${esc(k.key_code)}</span></td>
-                <td>${fmtDur(k.duration_hours)}</td><td>${badge}</td>
-                <td>${esc(k.used_by||'—')}</td><td>${k.created_at?new Date(k.created_at).toLocaleDateString('pt-BR'):'—'}</td>
-                <td>${!k.is_used?`<button class="btn btn-sm ${k.is_active?'btn-danger':'btn-success'}" onclick="toggleKey(${k.id},${!k.is_active})">${k.is_active?'🚫':'✅'}</button>`:''}
-                <button class="btn btn-sm btn-danger btn-icon" onclick="deleteKey(${k.id})">🗑️</button></td></tr>`;
+                const isUsed = k.is_used;
+                const isActive = k.is_active !== false;
+                let statusBadge;
+                if (isUsed) {
+                    statusBadge = '<span class="badge badge-used">● Usada</span>';
+                } else if (isActive) {
+                    statusBadge = '<span class="badge badge-active">● Disponível</span>';
+                } else {
+                    statusBadge = '<span class="badge badge-inactive">● Desativada</span>';
+                }
+
+                const durationText = formatDuration(k.duration_hours);
+                const createdAt = k.created_at ? new Date(k.created_at).toLocaleDateString('pt-BR') : '—';
+                const usedBy = k.used_by || '—';
+
+                html += `<tr>
+                    <td><span class="key-code">${escHtml(k.key_code)}</span></td>
+                    <td>${durationText}</td>
+                    <td>${statusBadge}</td>
+                    <td>${escHtml(usedBy)}</td>
+                    <td>${createdAt}</td>
+                    <td>
+                        ${!isUsed ? `<button class="btn btn-sm ${isActive ? 'btn-danger' : 'btn-success'}" onclick="toggleKey('${k.id}', ${!isActive})">
+                            ${isActive ? '🚫' : '✅'}
+                        </button>` : ''}
+                        <button class="btn btn-sm btn-danger btn-icon" onclick="deleteKey('${k.id}')" title="Excluir">🗑️</button>
+                    </td>
+                </tr>`;
             });
-            h += '</tbody></table>';
-            w.innerHTML = h;
+
+            html += '</tbody></table>';
+            wrapper.innerHTML = html;
         }
 
-        async function toggleKey(id, active) {
-            const r = await sb('access_keys?id=eq.' + id, 'PATCH', { is_active: active }, 'return=minimal');
-            showToast(r.ok ? 'Atualizado!' : 'Erro', r.ok ? 'success' : 'error');
-            if (r.ok) loadKeys();
+        async function toggleKey(keyId, newStatus) {
+            const res = await apiCall('toggle_key', { key_id: keyId, is_active: newStatus });
+            showToast(res.message, res.success ? 'success' : 'error');
+            if (res.success) loadKeys();
         }
 
-        async function deleteKey(id) {
-            if (!confirm('Excluir chave?')) return;
-            const r = await sb('access_keys?id=eq.' + id, 'DELETE');
-            showToast(r.ok ? 'Excluída!' : 'Erro', r.ok ? 'success' : 'error');
-            if (r.ok) loadKeys();
+        async function deleteKey(keyId) {
+            if (!confirm('Deseja excluir esta chave?')) return;
+            const res = await apiCall('delete_key', { key_id: keyId });
+            showToast(res.message, res.success ? 'success' : 'error');
+            if (res.success) loadKeys();
         }
 
-        function genKeyCode() {
-            const c = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let s = [];
-            for (let i = 0; i < 4; i++) { let seg = ''; for (let j = 0; j < 4; j++) seg += c[Math.floor(Math.random()*c.length)]; s.push(seg); }
-            return '7MGFC-' + s.join('-');
+        function openGenerateKeysModal() {
+            document.getElementById('gen-quantity').value = '5';
+            document.getElementById('gen-duration').value = '720';
+            document.getElementById('generated-keys-output').innerHTML = '';
+            openModal('modal-generate-keys');
         }
 
         async function generateKeys() {
-            const qty = Math.min(Math.max(parseInt(document.getElementById('gen-quantity').value)||1,1),50);
-            const dur = parseInt(document.getElementById('gen-duration').value);
+            const quantity = parseInt(document.getElementById('gen-quantity').value);
+            const duration_hours = parseInt(document.getElementById('gen-duration').value);
+
             document.getElementById('btn-generate').disabled = true;
             document.getElementById('btn-generate').textContent = 'Gerando...';
-            const keysData = [];
-            const keyCodes = [];
-            for (let i = 0; i < qty; i++) {
-                const code = genKeyCode();
-                keyCodes.push(code);
-                keysData.push({ key_code: code, duration_hours: dur, is_used: false, is_active: true });
-            }
-            const r = await sb('access_keys', 'POST', keysData, 'return=representation');
+
+            const res = await apiCall('generate_keys', { quantity, duration_hours });
+
             document.getElementById('btn-generate').disabled = false;
             document.getElementById('btn-generate').textContent = 'Gerar Chaves';
-            if (r.ok) {
-                showToast(qty + ' chave(s) gerada(s)!', 'success');
-                let kh = `<div class="generated-keys"><p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">✅ ${qty} chave(s) — Validade: ${fmtDur(dur)}</p>`;
-                keyCodes.forEach(k => { kh += `<div class="key-item"><span>${k}</span><button class="btn-copy" onclick="copyKey('${k}',this)">Copiar</button></div>`; });
-                kh += `<button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%" onclick="copyAll()">📋 Copiar Todas</button></div>`;
-                document.getElementById('generated-keys-output').innerHTML = kh;
+
+            if (res.success) {
+                showToast(res.message, 'success');
+                
+                let keysHtml = '<div class="generated-keys">';
+                keysHtml += `<p style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">✅ ${res.keys.length} chave(s) gerada(s) — Validade: ${formatDuration(duration_hours)}</p>`;
+                
+                res.keys.forEach(key => {
+                    keysHtml += `<div class="key-item">
+                        <span>${key}</span>
+                        <button class="btn-copy" onclick="copyKey('${key}', this)">Copiar</button>
+                    </div>`;
+                });
+
+                keysHtml += `<button class="btn btn-ghost btn-sm" style="margin-top:10px;width:100%" onclick="copyAllKeys()">📋 Copiar Todas</button>`;
+                keysHtml += '</div>';
+
+                document.getElementById('generated-keys-output').innerHTML = keysHtml;
                 loadKeys();
-            } else { showToast('Erro ao gerar', 'error'); }
+            } else {
+                showToast(res.message, 'error');
+            }
         }
 
-        function copyKey(k, btn) { navigator.clipboard.writeText(k).then(() => { btn.textContent = '✓'; setTimeout(() => btn.textContent = 'Copiar', 1500); }); }
-        function copyAll() { const keys = [...document.querySelectorAll('.key-item span')].map(e => e.textContent).join('\n'); navigator.clipboard.writeText(keys).then(() => showToast('Todas copiadas!', 'success')); }
-
-        function fmtDur(h) { if (!h||h===0) return 'Sem exp.'; if (h<24) return h+'h'; const d=Math.floor(h/24); if (d<30) return d+'d'; const m=Math.floor(d/30); if (m<12) return m+'m'; return Math.floor(m/12)+'a'; }
-        function esc(s) { if (!s) return ''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-        function openModal(id) { document.getElementById(id).classList.add('show'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-        document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => { if (e.target===o) o.classList.remove('show'); }));
-
-        function showToast(msg, type='success') {
-            const c = document.getElementById('toast-container');
-            const t = document.createElement('div'); t.className = `toast toast-${type}`;
-            t.innerHTML = `<span>${type==='success'?'✅':'❌'}</span> ${esc(msg)}`;
-            c.appendChild(t);
-            setTimeout(() => { t.style.animation = 'toastOut .3s ease forwards'; setTimeout(() => t.remove(), 300); }, 3500);
+        function copyKey(key, btn) {
+            navigator.clipboard.writeText(key).then(() => {
+                btn.textContent = '✓';
+                setTimeout(() => btn.textContent = 'Copiar', 1500);
+            });
         }
 
-        function handleLogout() { localStorage.removeItem('7mgfc_user'); window.location.href = '/login.html'; }
+        function copyAllKeys() {
+            const keys = document.querySelectorAll('.key-item span');
+            const allKeys = Array.from(keys).map(el => el.textContent).join('\n');
+            navigator.clipboard.writeText(allKeys).then(() => {
+                showToast('Todas as chaves copiadas!', 'success');
+            });
+        }
 
+        // ==================== HELPERS ====================
+        function formatDuration(hours) {
+            if (!hours || hours === 0) return 'Sem expiração';
+            if (hours < 24) return hours + 'h';
+            const days = Math.floor(hours / 24);
+            if (days < 30) return days + ' dia(s)';
+            const months = Math.floor(days / 30);
+            if (months < 12) return months + ' mês(es)';
+            return Math.floor(months / 12) + ' ano(s)';
+        }
+
+        function escHtml(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('show');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.classList.remove('show');
+            });
+        });
+
+        // ==================== TOAST ====================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<span>${type === 'success' ? '✅' : '❌'}</span> ${escHtml(message)}`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'toastOut 0.3s ease forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // ==================== LOGOUT ====================
+        async function handleLogout() {
+            const res = await apiCall('logout');
+            window.location.href = '/';
+        }
+
+        // ==================== INIT ====================
         loadDashboard();
     </script>
 </body>

@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Extensão ultra-minimalista para download e gerenciamento local de arquivos e recursos.",
   "action": {
-    "default_popup": "index.html",
+    "default_popup": "app.html",
     "default_title": "7MGFC"
   },
   "background": {
