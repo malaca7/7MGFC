@@ -75,7 +75,7 @@ export function App() {
   useEffect(() => {
     const savedUser = localStorage.getItem('7mgfc_user');
 
-    if (!savedUser && (typeof chrome === 'undefined' || !chrome.extension)) {
+    if (!savedUser) {
       window.location.href = '/index.html';
       return;
     }

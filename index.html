@@ -360,7 +360,10 @@
 
                 showSuccess('Login realizado com sucesso!');
                 setTimeout(() => {
-                    if (user.role === 'admin') {
+                    const isExtension = typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id;
+                    if (isExtension) {
+                        window.location.href = '/app.html';
+                    } else if (user.role === 'admin') {
                         window.location.href = '/ceo/index.html';
                     } else {
                         window.location.href = '/dashboard.html';
