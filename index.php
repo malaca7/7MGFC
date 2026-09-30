@@ -1,0 +1,583 @@
+<?php
+session_start();
+
+// Se já está logado, redirecionar
+if (isset($_SESSION['user'])) {
+    if ($_SESSION['user']['role'] === 'admin') {
+        header('Location: /ceo/');
+    } else {
+        header('Location: dashboard.php');
+    }
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7MGFC — Login</title>
+    <meta name="description" content="7MGFC - Sistema de gerenciamento de downloads premium">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: rgba(18, 18, 28, 0.85);
+            --bg-input: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.06);
+            --border-focus: rgba(99, 102, 241, 0.5);
+            --text-primary: #f0f0f5;
+            --text-secondary: #8b8b9e;
+            --text-muted: #5a5a6e;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(60px, 60px); }
+        }
+
+        .bg-orbs {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .bg-orbs::before, .bg-orbs::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            animation: orbFloat 15s ease-in-out infinite alternate;
+        }
+
+        .bg-orbs::before {
+            width: 500px;
+            height: 500px;
+            background: var(--accent);
+            top: -200px;
+            right: -100px;
+        }
+
+        .bg-orbs::after {
+            width: 400px;
+            height: 400px;
+            background: #a855f7;
+            bottom: -150px;
+            left: -100px;
+            animation-delay: -7s;
+        }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.1); }
+        }
+
+        /* Login Container */
+        .auth-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px 32px;
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+        }
+
+        /* Logo */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--accent), #a855f7);
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 24px var(--accent-glow);
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -1px;
+        }
+
+        .logo-title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .logo-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Tabs */
+        .auth-tabs {
+            display: flex;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            padding: 3px;
+            margin-bottom: 28px;
+            border: 1px solid var(--border);
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.25s ease;
+        }
+
+        .auth-tab.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 12px var(--accent-glow);
+        }
+
+        .auth-tab:not(.active):hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-input:focus {
+            border-color: var(--border-focus);
+            background: rgba(99, 102, 241, 0.04);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .form-input.error {
+            border-color: var(--error);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        /* Key Input Style */
+        .key-input-wrapper {
+            position: relative;
+        }
+
+        .key-input-wrapper .form-input {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .key-input-wrapper .key-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            opacity: 0.4;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--accent), #818cf8);
+            border: none;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px var(--accent-glow);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-submit .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin: 0 auto;
+        }
+
+        .btn-submit.loading .btn-text { display: none; }
+        .btn-submit.loading .spinner { display: block; }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            margin-bottom: 18px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: alertSlide 0.3s ease;
+        }
+
+        .alert.show { display: flex; }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+        }
+
+        @keyframes alertSlide {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer */
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Transition for form panels */
+        .form-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .form-panel.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .auth-card { padding: 28px 20px; }
+            .auth-container { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-orbs"></div>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Logo -->
+            <div class="logo-section">
+                <div class="logo-icon">7M</div>
+                <h1 class="logo-title">7MGFC</h1>
+                <p class="logo-subtitle">Sistema de Downloads Premium</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login" id="tab-login">Entrar</button>
+                <button class="auth-tab" data-tab="register" id="tab-register">Cadastrar</button>
+            </div>
+
+            <!-- Alerts -->
+            <div class="alert alert-error" id="alert-error">
+                <span>⚠️</span>
+                <span id="error-text"></span>
+            </div>
+            <div class="alert alert-success" id="alert-success">
+                <span>✅</span>
+                <span id="success-text"></span>
+            </div>
+
+            <!-- Login Form -->
+            <div class="form-panel active" id="panel-login">
+                <form id="form-login" onsubmit="return handleLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="login-username">Usuário</label>
+                        <input type="text" class="form-input" id="login-username" placeholder="Seu nome de usuário" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="login-password">Senha</label>
+                        <input type="password" class="form-input" id="login-password" placeholder="Sua senha" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-login">
+                        <span class="btn-text">Entrar</span>
+                        <div class="spinner"></div>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Register Form -->
+            <div class="form-panel" id="panel-register">
+                <form id="form-register" onsubmit="return handleRegister(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="reg-username">Usuário</label>
+                        <input type="text" class="form-input" id="reg-username" placeholder="Escolha um nome de usuário" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="reg-password">Senha</label>
+                        <input type="password" class="form-input" id="reg-password" placeholder="Mínimo 6 caracteres" required minlength="6" autocomplete="new-password">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="reg-key">Chave de Acesso</label>
+                        <div class="key-input-wrapper">
+                            <input type="text" class="form-input" id="reg-key" placeholder="7MGFC-XXXX-XXXX-XXXX-XXXX" required>
+                            <span class="key-icon">🔑</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit" id="btn-register">
+                        <span class="btn-text">Criar Conta</span>
+                        <div class="spinner"></div>
+                    </button>
+                </form>
+            </div>
+
+            <div class="auth-footer">
+                © 2026 7MGFC · Sistema Premium
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'src/backend/api.php';
+
+        // Tab switching
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+                hideAlerts();
+            });
+        });
+
+        function showError(msg) {
+            const el = document.getElementById('alert-error');
+            document.getElementById('error-text').textContent = msg;
+            el.classList.add('show');
+            document.getElementById('alert-success').classList.remove('show');
+        }
+
+        function showSuccess(msg) {
+            const el = document.getElementById('alert-success');
+            document.getElementById('success-text').textContent = msg;
+            el.classList.add('show');
+            document.getElementById('alert-error').classList.remove('show');
+        }
+
+        function hideAlerts() {
+            document.getElementById('alert-error').classList.remove('show');
+            document.getElementById('alert-success').classList.remove('show');
+        }
+
+        function setLoading(btnId, loading) {
+            const btn = document.getElementById(btnId);
+            if (loading) {
+                btn.classList.add('loading');
+                btn.disabled = true;
+            } else {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            hideAlerts();
+            setLoading('btn-login', true);
+
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const res = await fetch(API_URL + '?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showSuccess(data.message);
+                    setTimeout(() => {
+                        if (data.user && data.user.role === 'admin') {
+                            window.location.href = '/ceo/';
+                        } else {
+                            window.location.href = 'dashboard.php';
+                        }
+                    }, 800);
+                } else {
+                    showError(data.message);
+                }
+            } catch (err) {
+                showError('Erro de conexão. Tente novamente.');
+            } finally {
+                setLoading('btn-login', false);
+            }
+            return false;
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            hideAlerts();
+            setLoading('btn-register', true);
+
+            const username = document.getElementById('reg-username').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const access_key = document.getElementById('reg-key').value.trim();
+
+            try {
+                const res = await fetch(API_URL + '?action=register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, access_key })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    showSuccess(data.message);
+                    // Switch to login tab
+                    setTimeout(() => {
+                        document.getElementById('tab-login').click();
+                        document.getElementById('login-username').value = username;
+                        document.getElementById('login-password').focus();
+                    }, 1500);
+                } else {
+                    showError(data.message);
+                }
+            } catch (err) {
+                showError('Erro de conexão. Tente novamente.');
+            } finally {
+                setLoading('btn-register', false);
+            }
+            return false;
+        }
+    </script>
+</body>
+</html>
