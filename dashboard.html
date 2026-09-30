@@ -278,8 +278,8 @@
                 const dd = String(now.getDate()).padStart(2, '0');
                 const dateKey = `${yyyy}-${mm}-${dd}`;
 
-                const usageData = await supabaseRequest(`downloads?user_id=eq.${encodeURIComponent(freshUser.username)}&download_date=eq.${dateKey}&select=id`, 'GET');
-                const used = usageData ? usageData.length : 0;
+                const usageData = await supabaseRequest(`daily_limits?user_id=eq.${encodeURIComponent(freshUser.username)}&download_date=eq.${dateKey}&select=*`, 'GET');
+                const used = usageData && usageData.length > 0 ? Number(usageData[0].downloads_used) : 0;
                 
                 const limit = freshUser.daily_limit || 30;
                 const remaining = Math.max(0, limit - used);

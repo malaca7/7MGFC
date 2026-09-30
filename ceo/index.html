@@ -1132,7 +1132,13 @@
                     const users = await supabaseRequest('users?select=id,is_active');
                     const keys = await supabaseRequest('access_keys?select=id,used');
                     const dateKey = new Date().toISOString().split('T')[0];
-                    const downloads = await supabaseRequest(`downloads?download_date=eq.${dateKey}&select=id`);
+                    const dailyLimits = await supabaseRequest(`daily_limits?download_date=eq.${dateKey}&select=downloads_used`);
+                    let totalDownloads = 0;
+                    if (dailyLimits && dailyLimits.length > 0) {
+                        for (let r of dailyLimits) {
+                            totalDownloads += Number(r.downloads_used) || 0;
+                        }
+                    }
                     return {
                         success: true,
                         stats: {
@@ -1140,7 +1146,7 @@
                             active_users: users.filter(u => u.is_active !== false).length,
                             total_keys: keys.length,
                             available_keys: keys.filter(k => !k.used).length,
-                            today_downloads: downloads.length
+                            today_downloads: totalDownloads
                         }
                     };
                 }
