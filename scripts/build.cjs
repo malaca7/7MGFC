@@ -10,7 +10,7 @@ execSync('npx tsc --noEmit', { stdio: 'inherit' });
 // 2. Vite Build
 execSync('npx vite build', { stdio: 'inherit' });
 
-// 3. Sincronizar assets para a raiz (garante funcionamento no GitHub Pages)
+// 3. Sincronizar assets para a raiz
 const rootDir = path.resolve(__dirname, '..');
 const distAssets = path.join(rootDir, 'dist', 'assets');
 const rootAssets = path.join(rootDir, 'assets');
@@ -29,10 +29,16 @@ if (fs.existsSync(distAssets)) {
   }
 }
 
-// 4. Garantir .nojekyll
-const noJekyllPath = path.join(rootDir, '.nojekyll');
-if (!fs.existsSync(noJekyllPath)) {
-  fs.writeFileSync(noJekyllPath, '# disable jekyll\n');
+// 4. Garantir CNAME e .nojekyll no dist
+const cnameSrc = path.join(rootDir, 'CNAME');
+const cnameDist = path.join(rootDir, 'dist', 'CNAME');
+if (fs.existsSync(cnameSrc)) {
+  fs.copyFileSync(cnameSrc, cnameDist);
+  console.log('[7MGFC Build] CNAME copiado para dist/CNAME');
 }
 
-console.log('[7MGFC Build] Compilação e preparação para GitHub Pages concluídas com sucesso!');
+const noJekyllDist = path.join(rootDir, 'dist', '.nojekyll');
+fs.writeFileSync(noJekyllDist, '# disable jekyll\n');
+console.log('[7MGFC Build] .nojekyll criado em dist/.nojekyll');
+
+console.log('[7MGFC Build] Compilação e preparação concluídas com sucesso!');

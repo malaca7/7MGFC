@@ -8,10 +8,11 @@ export default defineConfig({
   base: './',
   build: {
     outDir: 'dist',
-    emptyOutDir: false,
+    emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: resolve(import.meta.dirname, 'src/main.tsx'),
+        main: resolve(import.meta.dirname, 'index.html'),
+        ceo: resolve(import.meta.dirname, 'ceo/index.html'),
       },
       output: {
         entryFileNames: 'assets/[name].js',
