@@ -1130,7 +1130,7 @@
                 }
                 if (action === 'dashboard_stats') {
                     const users = await supabaseRequest('users?select=id,is_active');
-                    const keys = await supabaseRequest('access_keys?select=id,used');
+                    const keys = await supabaseRequest('access_keys?select=id,is_used,is_active');
                     const dateKey = new Date().toISOString().split('T')[0];
                     const dailyLimits = await supabaseRequest(`daily_limits?download_date=eq.${dateKey}&select=downloads_used`);
                     let totalDownloads = 0;
@@ -1145,7 +1145,7 @@
                             total_users: users.length,
                             active_users: users.filter(u => u.is_active !== false).length,
                             total_keys: keys.length,
-                            available_keys: keys.filter(k => !k.used).length,
+                            available_keys: keys.filter(k => !k.is_used && k.is_active !== false).length,
                             today_downloads: totalDownloads
                         }
                     };
@@ -1208,6 +1208,7 @@
                 }
                 if (action === 'generate_keys') {
                     const generated = [];
+                    const records = [];
                     for(let i=0; i<data.quantity; i++) {
                         const segments = [];
                         for(let j=0; j<4; j++) {
@@ -1215,12 +1216,14 @@
                         }
                         const key = '7MGFC-' + segments.join('-');
                         generated.push(key);
-                        await supabaseRequest('access_keys', 'POST', {
+                        records.push({
                             key_code: key,
                             duration_hours: data.duration_hours,
-                            valid_days: data.duration_hours > 0 ? data.duration_hours / 24 : null
+                            is_used: false,
+                            is_active: true
                         });
                     }
+                    await supabaseRequest('access_keys', 'POST', records);
                     return { success: true, message: 'Chaves geradas com sucesso.', keys: generated };
                 }
             } catch (err) {

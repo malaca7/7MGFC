@@ -114,14 +114,14 @@ export function AuthView({ onLoginSuccess }: AuthViewProps) {
     setLoading(true);
 
     try {
-      // 1. Check access key in Supabase (support 'key' or 'key_code')
+      // 1. Check access key in Supabase (key_code is standard, key as fallback)
       let keys = await supabaseRequest(
-        `access_keys?key=eq.${encodeURIComponent(accessKey)}&select=*`
+        `access_keys?key_code=eq.${encodeURIComponent(accessKey)}&select=*`
       ).catch(() => null);
 
       if (!keys || keys.length === 0) {
         keys = await supabaseRequest(
-          `access_keys?key_code=eq.${encodeURIComponent(accessKey)}&select=*`
+          `access_keys?key=eq.${encodeURIComponent(accessKey)}&select=*`
         ).catch(() => null);
       }
 
@@ -182,14 +182,21 @@ export function AuthView({ onLoginSuccess }: AuthViewProps) {
 
       await supabaseRequest('users', 'POST', newUser);
 
-      // 4. Mark key as used
-      const updateKeyPayload: any = {
-        used: true,
+      // 4. Mark key as used (schema uses is_used, used_by, used_at, expires_at)
+      const updateKeyPayload: Record<string, any> = {
         is_used: true,
         used_by: username,
         used_at: new Date().toISOString(),
       };
-      await supabaseRequest(`access_keys?id=eq.${keyData.id}`, 'PATCH', updateKeyPayload).catch(() => null);
+      if (expiresAt) {
+        updateKeyPayload.expires_at = expiresAt;
+      }
+      if ('used' in keyData) {
+        updateKeyPayload.used = true;
+      }
+      await supabaseRequest(`access_keys?id=eq.${keyData.id}`, 'PATCH', updateKeyPayload).catch((e) => {
+        console.warn('Erro ao atualizar status da chave:', e);
+      });
 
       setSuccessMessage('Conta criada com sucesso! Redirecionando para login...');
       setTimeout(() => {

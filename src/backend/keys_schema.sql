@@ -16,6 +16,12 @@ CREATE TABLE IF NOT EXISTS public.access_keys (
     expires_at TIMESTAMPTZ DEFAULT NULL
 );
 
+-- Garantir colunas na tabela access_keys se a tabela já existir previamente
+ALTER TABLE public.access_keys ADD COLUMN IF NOT EXISTS duration_hours INT DEFAULT 720;
+ALTER TABLE public.access_keys ADD COLUMN IF NOT EXISTS valid_days INT DEFAULT NULL;
+ALTER TABLE public.access_keys ADD COLUMN IF NOT EXISTS is_used BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.access_keys ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+
 -- 2. Adicionar campos extras na tabela users (se não existirem)
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS email TEXT DEFAULT NULL;
 ALTER TABLE public.users ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
