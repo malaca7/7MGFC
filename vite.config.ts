@@ -8,24 +8,16 @@ export default defineConfig({
   base: './',
   build: {
     outDir: 'dist',
-    emptyOutDir: true,
+    emptyOutDir: false,
     rollupOptions: {
       input: {
-        popup: resolve(import.meta.dirname, 'app.html'),
-        index: resolve(import.meta.dirname, 'index.html'),
-        background: resolve(import.meta.dirname, 'src/background/service-worker.ts'),
+        main: resolve(import.meta.dirname, 'src/main.tsx'),
       },
       output: {
-        entryFileNames: (chunkInfo) => {
-          if (chunkInfo.name === 'background') {
-            return 'service-worker.js';
-          }
-          return 'assets/[name]-[hash].js';
-        },
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
+        entryFileNames: 'assets/[name].js',
+        chunkFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name].[ext]',
       },
     },
   },
 });
-

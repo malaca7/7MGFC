@@ -1084,7 +1084,7 @@
         } else {
             const user = JSON.parse(savedUser);
             if (user.role !== 'admin') {
-                window.location.href = '/dashboard.html';
+                window.location.href = '/';
             } else {
                 document.getElementById('ui-admin-username').textContent = user.username;
                 document.getElementById('ui-admin-avatar').textContent = user.username.substring(0,2).toUpperCase();

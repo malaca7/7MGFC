@@ -66,7 +66,7 @@ export interface ResourceDetails {
 }
 
 export interface DownloadProgress {
-  downloadId: number;
+  downloadId?: number | string;
   receivedBytes: number;
   totalBytes: number;
   percent: number;
@@ -100,4 +100,15 @@ export interface AppSettings {
   maxHistoryItems: number;
   magnificApiKey?: string;
   bypassPremium?: boolean;
+}
+
+export interface UserSession {
+  id?: number | string;
+  username: string;
+  role?: string;
+  daily_limit?: number;
+  expires_at?: string | null;
+  is_active?: boolean;
+  email?: string | null;
+  access_key_used?: string | null;
 }
