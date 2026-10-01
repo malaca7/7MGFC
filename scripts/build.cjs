@@ -41,4 +41,12 @@ const noJekyllDist = path.join(rootDir, 'dist', '.nojekyll');
 fs.writeFileSync(noJekyllDist, '# disable jekyll\n');
 console.log('[7MGFC Build] .nojekyll criado em dist/.nojekyll');
 
+// 5. Garantir index.html no dist
+const indexSrc = path.join(rootDir, 'index.html');
+const indexDist = path.join(rootDir, 'dist', 'index.html');
+if (fs.existsSync(indexSrc)) {
+  fs.copyFileSync(indexSrc, indexDist);
+  console.log('[7MGFC Build] index.html copiado para dist/index.html');
+}
+
 console.log('[7MGFC Build] Compilação e preparação concluídas com sucesso!');
