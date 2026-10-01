@@ -100,6 +100,7 @@ export interface AppSettings {
   maxHistoryItems: number;
   magnificApiKey?: string;
   bypassPremium?: boolean;
+  devMockMode?: boolean;
 }
 
 export interface UserSession {

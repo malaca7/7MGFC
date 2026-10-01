@@ -38,6 +38,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   maxHistoryItems: 50,
   magnificApiKey: '',
   bypassPremium: true,
+  devMockMode: true,
 };
 
 export function App() {
@@ -173,20 +174,25 @@ export function App() {
 
   // Iniciar download oficial no navegador
   const triggerDownload = useCallback(
-    async (targetResource: ResourceDetails, customApiKey?: string) => {
+    async (
+      targetResource: ResourceDetails,
+      customApiKey?: string,
+      forceDevMock?: boolean
+    ) => {
       if (!targetResource?.url) {
         setErrorMessage('Nenhuma URL de download autorizada foi encontrada.');
         setAppState('error');
         return;
       }
 
+      const isDevMock = forceDevMock ?? Boolean(settings.devMockMode);
       const activeApiKey = (customApiKey ?? settings.magnificApiKey)?.trim();
       const isApiEndpoint =
         targetResource.url.includes('api.magnific.com') ||
         targetResource.url.includes('api.freepik.com') ||
         targetResource.url.includes('/api/v1/');
 
-      if (isApiEndpoint && !activeApiKey) {
+      if (isApiEndpoint && !activeApiKey && !isDevMock) {
         setErrorMessage(
           'Para baixar este recurso Premium diretamente pelo 7MGFC, insira sua Chave de API Magnific / Freepik abaixo ou utilize a opção "Abrir na Conta Oficial".'
         );
@@ -199,7 +205,7 @@ export function App() {
       setProgress({
         downloadId: Date.now(),
         receivedBytes: 0,
-        totalBytes: targetResource.size || 0,
+        totalBytes: targetResource.size || (isDevMock ? 6840000 : 0),
         percent: 0,
         speed: 0,
         state: 'in_progress',
@@ -211,6 +217,13 @@ export function App() {
           filename: targetResource.filename,
           apiKey: activeApiKey,
           alternativeUrls: targetResource.alternativeDownloadUrls,
+          isDevMock,
+          resourceDetails: {
+            resourceId: targetResource.resourceId,
+            type: targetResource.type,
+            platform: targetResource.platform,
+            slug: targetResource.slug,
+          },
           onProgress: (p) => setProgress(p),
         });
 
@@ -223,7 +236,7 @@ export function App() {
         // Sucesso no download
         setAppState('completed');
 
-        // Incrementa uso diário no Supabase
+        // Incrementa uso diário no Supabase apenas após download bem-sucedido
         if (user?.username) {
           const updatedUsage = await incrementDownloadUsage(user.username, usage.limit);
           setUsage(updatedUsage);
@@ -241,7 +254,7 @@ export function App() {
           filename: targetResource.filename,
           url: targetResource.originalUrl || targetResource.url,
           date: Date.now(),
-          size: targetResource.size || null,
+          size: targetResource.size || (isDevMock ? 6840000 : null),
           status: 'completed',
           type: targetResource.type || 'ARQUIVO',
         };
@@ -294,6 +307,9 @@ export function App() {
       if (magnificRes.isDirectCdnUrl) {
         isProtected = false;
         statusMessage = 'Link CDN Direto Autorizado ⚡ Pronto para baixar';
+      } else if (settings.devMockMode) {
+        isProtected = false;
+        statusMessage = 'Modo Dev / Simulação Ativo ⚡ Autorização Local & Download Liberado';
       } else if (hasApiKey) {
         isProtected = false;
         statusMessage = 'Recurso Oficial Identificado ⚡ Chave de API Configurada';
@@ -333,7 +349,7 @@ export function App() {
       setResource(identifiedResource);
       setAppState('identified');
 
-      if (settings.autoDownload && (hasApiKey || magnificRes.isDirectCdnUrl)) {
+      if (settings.autoDownload && (hasApiKey || magnificRes.isDirectCdnUrl || settings.devMockMode)) {
         triggerDownload(identifiedResource);
       }
       return;
@@ -617,6 +633,19 @@ export function App() {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
+                    onClick={() => updateSetting('devMockMode', !settings.devMockMode)}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer border ${
+                      settings.devMockMode
+                        ? 'bg-purple-950/70 text-purple-300 border-purple-400/40 shadow-sm shadow-purple-500/20'
+                        : 'bg-white/5 text-[#80808e] border-white/10 hover:text-white'
+                    }`}
+                    title="Alternar Modo de Desenvolvimento / Mock para testes com simulação completa"
+                  >
+                    <span>🧪 Dev/Mock: {settings.devMockMode ? 'ON' : 'OFF'}</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handlePasteClipboard}
                     className="text-xs font-bold text-[#E50914] hover:text-[#ff3843] bg-[#E50914]/10 hover:bg-[#E50914]/20 border border-[#E50914]/30 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
                     title="Colar automaticamente o conteúdo da sua área de transferência"
@@ -638,6 +667,47 @@ export function App() {
                   </button>
                 </div>
               </div>
+
+              {/* Development Mock Banner & Quick Test Buttons */}
+              {settings.devMockMode && (
+                <div className="mb-2 p-3 bg-gradient-to-r from-purple-950/40 to-[#101018] border border-purple-500/30 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2 text-purple-200">
+                    <span className="text-base">🧪</span>
+                    <div>
+                      <strong className="text-purple-300">Modo Desenvolvimento & Testes Ativo:</strong>
+                      <span className="text-[#a0a0ba] ml-1">
+                        Downloads simulados com autorização local de testes.
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const sample =
+                          'https://www.magnific.com/premium-psd/eletro-funk-party-flyer-template-with-dj-lineup_433136414.htm#fromView=search&page=2&position=9&uuid=4657d59e-c002-4e92-8328-8a7aba170633&track=ais_hybrid&query=flyer+show';
+                        setUrl(sample);
+                        handleProcessUrl(undefined, sample);
+                      }}
+                      className="px-2.5 py-1 bg-purple-600/30 hover:bg-purple-600/50 text-purple-200 rounded-lg border border-purple-400/30 transition-colors cursor-pointer text-[11px] font-semibold"
+                    >
+                      Testar Flyer PSD
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const sample =
+                          'https://www.freepik.com/premium-vector/music-event-neon-party-poster-template_29108421.htm';
+                        setUrl(sample);
+                        handleProcessUrl(undefined, sample);
+                      }}
+                      className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white rounded-lg border border-white/10 transition-colors cursor-pointer text-[11px]"
+                    >
+                      Testar Vetor
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <form onSubmit={handleProcessUrl} className="flex flex-col gap-4">
                 <div className="relative">
@@ -863,8 +933,26 @@ export function App() {
                           <span className="text-base">⬇</span>
                           <span>BAIXAR ARQUIVO CDN AGORA</span>
                         </button>
+                      ) : settings.devMockMode ? (
+                        /* Caso 2: Modo Desenvolvimento & Mock Ativo (Autorização Local) */
+                        <div className="flex flex-col gap-2.5">
+                          <button
+                            type="button"
+                            onClick={() => triggerDownload(resource, undefined, true)}
+                            className="w-full bg-gradient-to-r from-purple-600 via-[#E50914] to-red-600 hover:brightness-110 active:scale-[0.99] text-white font-extrabold py-3.5 px-6 rounded-xl uppercase tracking-wider text-xs transition-all shadow-xl shadow-purple-600/30 flex items-center justify-center gap-2.5 cursor-pointer"
+                          >
+                            <span className="text-base">🧪</span>
+                            <span>BAIXAR ARQUIVO (MODO DESENVOLVIMENTO / MOCK)</span>
+                          </button>
+                          <div className="flex items-center justify-between text-[11px] text-[#a0a0aa] px-1">
+                            <span className="text-purple-300 font-mono flex items-center gap-1">
+                              <span>✓</span> Autorização Local Ativa • Teste Completo no Navegador
+                            </span>
+                            <span className="text-[10px] text-[#777]">100% Mock Safe</span>
+                          </div>
+                        </div>
                       ) : settings.magnificApiKey?.trim() ? (
-                        /* Caso 2: Chave de API Configurada */
+                        /* Caso 3: Chave de API Configurada */
                         <div className="flex flex-col gap-2">
                           <button
                             type="button"
@@ -888,7 +976,7 @@ export function App() {
                           </div>
                         </div>
                       ) : (
-                        /* Caso 3: Recurso Premium sem Chave de API configurada */
+                        /* Caso 4: Recurso Premium sem Chave de API configurada */
                         <div className="flex flex-col gap-3">
                           <button
                             type="button"
@@ -1323,6 +1411,32 @@ export function App() {
             </div>
 
             <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-white/10 flex flex-col gap-6">
+              {/* Dev / Mock Mode Toggle */}
+              <div className="flex items-center justify-between pb-4 border-b border-white/5">
+                <div>
+                  <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
+                    <span>🧪</span>
+                    <span>Modo Desenvolvimento & Mock (Simulação Local)</span>
+                  </h4>
+                  <p className="text-xs text-[#80808e] mt-0.5">
+                    Gera arquivos de teste locais para validar o fluxo de download, cálculo de velocidade e interface
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => updateSetting('devMockMode', !settings.devMockMode)}
+                  className={`w-12 h-6 rounded-full p-1 transition-colors duration-200 cursor-pointer ${
+                    settings.devMockMode ? 'bg-purple-600' : 'bg-white/15'
+                  }`}
+                >
+                  <div
+                    className={`w-4 h-4 rounded-full bg-white shadow-md transform transition-transform duration-200 ${
+                      settings.devMockMode ? 'translate-x-6' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+
               {/* Bypass Toggle */}
               <div className="flex items-center justify-between pb-4 border-b border-white/5">
                 <div>
