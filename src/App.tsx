@@ -54,6 +54,14 @@ export function App() {
   const [copied, setCopied] = useState<boolean>(false);
   const [usage, setUsage] = useState({ used: 0, limit: 30, remaining: 30 });
   const [accountDetails, setAccountDetails] = useState<any>(null);
+  const [inlineApiKey, setInlineApiKey] = useState<string>('');
+
+  // Sincroniza inlineApiKey com configurações salvas
+  useEffect(() => {
+    if (settings.magnificApiKey && !inlineApiKey) {
+      setInlineApiKey(settings.magnificApiKey);
+    }
+  }, [settings.magnificApiKey, inlineApiKey]);
 
   // Carrega configurações e histórico do localStorage
   useEffect(() => {
@@ -165,10 +173,24 @@ export function App() {
 
   // Iniciar download oficial no navegador
   const triggerDownload = useCallback(
-    async (targetResource: ResourceDetails) => {
+    async (targetResource: ResourceDetails, customApiKey?: string) => {
       if (!targetResource?.url) {
         setErrorMessage('Nenhuma URL de download autorizada foi encontrada.');
         setAppState('error');
+        return;
+      }
+
+      const activeApiKey = (customApiKey ?? settings.magnificApiKey)?.trim();
+      const isApiEndpoint =
+        targetResource.url.includes('api.magnific.com') ||
+        targetResource.url.includes('api.freepik.com') ||
+        targetResource.url.includes('/api/v1/');
+
+      if (isApiEndpoint && !activeApiKey) {
+        setErrorMessage(
+          'Para baixar este recurso Premium diretamente pelo 7MGFC, insira sua Chave de API Magnific / Freepik abaixo ou utilize a opção "Abrir na Conta Oficial".'
+        );
+        setAppState('identified');
         return;
       }
 
@@ -187,7 +209,7 @@ export function App() {
         const result = await executeWebDownload({
           url: targetResource.url,
           filename: targetResource.filename,
-          apiKey: settings.magnificApiKey,
+          apiKey: activeApiKey,
           alternativeUrls: targetResource.alternativeDownloadUrls,
           onProgress: (p) => setProgress(p),
         });
@@ -265,12 +287,18 @@ export function App() {
 
     if (magnificRes) {
       const isPremium = magnificRes.tier === 'premium';
+      const hasApiKey = Boolean(settings.magnificApiKey?.trim());
       let isProtected = magnificRes.isProtected;
       let statusMessage = magnificRes.statusMessage;
 
-      if (settings.bypassPremium) {
+      if (magnificRes.isDirectCdnUrl) {
         isProtected = false;
-        statusMessage = 'Bypass Ativado ⚡ Download Oficial Liberado';
+        statusMessage = 'Link CDN Direto Autorizado ⚡ Pronto para baixar';
+      } else if (hasApiKey) {
+        isProtected = false;
+        statusMessage = 'Recurso Oficial Identificado ⚡ Chave de API Configurada';
+      } else if (settings.bypassPremium) {
+        statusMessage = 'Recurso Premium Oficial • Disponível via Conta Oficial ou Chave de API';
       }
 
       const identifiedResource: ResourceDetails = {
@@ -305,7 +333,7 @@ export function App() {
       setResource(identifiedResource);
       setAppState('identified');
 
-      if (settings.autoDownload && !isProtected) {
+      if (settings.autoDownload && (hasApiKey || magnificRes.isDirectCdnUrl)) {
         triggerDownload(identifiedResource);
       }
       return;
@@ -824,20 +852,117 @@ export function App() {
                     )}
 
                     {/* Action buttons */}
-                    <div className="flex flex-col gap-2.5 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => triggerDownload(resource)}
-                        className="w-full bg-[#E50914] hover:bg-[#ff1f2d] active:bg-[#c40811] text-white font-extrabold py-3.5 px-6 rounded-xl uppercase tracking-wider text-xs transition-all shadow-xl shadow-[#E50914]/30 flex items-center justify-center gap-2.5 cursor-pointer"
-                      >
-                        <span className="text-base">⬇</span>
-                        <span>BAIXAR ARQUIVO OFICIAL AGORA</span>
-                      </button>
+                    <div className="flex flex-col gap-3 pt-2">
+                      {/* Caso 1: Link CDN Direto (assinado / arquivo binário) */}
+                      {resource.isDirectCdnUrl ? (
+                        <button
+                          type="button"
+                          onClick={() => triggerDownload(resource)}
+                          className="w-full bg-[#E50914] hover:bg-[#ff1f2d] active:bg-[#c40811] text-white font-extrabold py-3.5 px-6 rounded-xl uppercase tracking-wider text-xs transition-all shadow-xl shadow-[#E50914]/30 flex items-center justify-center gap-2.5 cursor-pointer"
+                        >
+                          <span className="text-base">⬇</span>
+                          <span>BAIXAR ARQUIVO CDN AGORA</span>
+                        </button>
+                      ) : settings.magnificApiKey?.trim() ? (
+                        /* Caso 2: Chave de API Configurada */
+                        <div className="flex flex-col gap-2">
+                          <button
+                            type="button"
+                            onClick={() => triggerDownload(resource)}
+                            className="w-full bg-[#E50914] hover:bg-[#ff1f2d] active:bg-[#c40811] text-white font-extrabold py-3.5 px-6 rounded-xl uppercase tracking-wider text-xs transition-all shadow-xl shadow-[#E50914]/30 flex items-center justify-center gap-2.5 cursor-pointer"
+                          >
+                            <span className="text-base">⚡</span>
+                            <span>BAIXAR VIA API OFICIAL AGORA</span>
+                          </button>
+                          <div className="flex items-center justify-between text-[11px] text-[#80808e] px-1">
+                            <span className="text-emerald-400 font-mono flex items-center gap-1">
+                              <span>✓</span> Chave API Ativa: {settings.magnificApiKey.trim().slice(0, 4)}...{settings.magnificApiKey.trim().slice(-4)}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setActiveTab('settings')}
+                              className="text-white hover:underline text-[11px] cursor-pointer"
+                            >
+                              Alterar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Caso 3: Recurso Premium sem Chave de API configurada */
+                        <div className="flex flex-col gap-3">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleOpenInBrowser(
+                                resource.pageUrl || resource.originalUrl || resource.url
+                              )
+                            }
+                            className="w-full bg-gradient-to-r from-[#E50914] to-red-600 hover:brightness-110 active:scale-[0.99] text-white font-extrabold py-3.5 px-6 rounded-xl uppercase tracking-wider text-xs transition-all shadow-xl shadow-[#E50914]/30 flex items-center justify-center gap-2.5 cursor-pointer"
+                          >
+                            <span className="text-base">↗</span>
+                            <span>
+                              ABRIR E BAIXAR NA CONTA OFICIAL{' '}
+                              {resource.platform === 'magnific' ? 'MAGNIFIC' : 'FREEPIK'} (1-CLIQUE)
+                            </span>
+                          </button>
+                          <p className="text-[11px] text-[#a0a0aa] text-center px-1">
+                            Se você possui assinatura ou login ativo no site, clique acima para abrir a página oficial e baixar diretamente na sua sessão.
+                          </p>
+
+                          {/* Quick API Key Box */}
+                          <div className="p-3 bg-[#0d0d14] rounded-xl border border-white/10 flex flex-col gap-2 mt-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="font-bold text-white flex items-center gap-1.5">
+                                <span>🔑</span>
+                                <span>Deseja baixar direto pelo 7MGFC?</span>
+                              </span>
+                              <a
+                                href={
+                                  resource.platform === 'freepik'
+                                    ? 'https://www.freepik.com/developers/dashboard/api-key'
+                                    : 'https://www.magnific.com/developers/dashboard/api-key'
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[10px] text-amber-400 hover:underline"
+                              >
+                                Obter chave API ↗
+                              </a>
+                            </div>
+                            <div className="flex gap-2">
+                              <input
+                                type="password"
+                                value={inlineApiKey}
+                                onChange={(e) => setInlineApiKey(e.target.value)}
+                                placeholder="Insira sua Chave de API oficial (ex: fpk_...)"
+                                className="flex-1 bg-[#14141e] border border-white/10 focus:border-[#E50914] rounded-lg px-3 py-2 text-xs text-white outline-none placeholder-[#555]"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (inlineApiKey.trim()) {
+                                    updateSetting('magnificApiKey', inlineApiKey.trim());
+                                    triggerDownload(resource, inlineApiKey.trim());
+                                  }
+                                }}
+                                disabled={!inlineApiKey.trim()}
+                                className="px-3 py-2 bg-[#E50914] hover:bg-[#ff1f2d] disabled:opacity-40 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer shrink-0"
+                              >
+                                Salvar & Baixar
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
-                          onClick={() => handleCopyDirectUrl(resource.url)}
+                          onClick={() =>
+                            handleCopyDirectUrl(
+                              resource.pageUrl || resource.originalUrl || resource.url
+                            )
+                          }
                           className="bg-[#14141c] hover:bg-[#1c1c28] border border-white/10 text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-colors cursor-pointer text-center"
                         >
                           {copied ? '✓ Link Copiado!' : '🔗 Copiar Link'}
@@ -846,11 +971,13 @@ export function App() {
                         <button
                           type="button"
                           onClick={() =>
-                            handleOpenInBrowser(resource.pageUrl || resource.url)
+                            handleOpenInBrowser(
+                              resource.pageUrl || resource.originalUrl || resource.url
+                            )
                           }
                           className="bg-[#14141c] hover:bg-[#1c1c28] border border-white/10 text-white text-xs font-semibold py-2.5 px-3 rounded-xl transition-colors cursor-pointer text-center"
                         >
-                          ↗ Abrir Oficial
+                          ↗ Página Oficial
                         </button>
                       </div>
                     </div>

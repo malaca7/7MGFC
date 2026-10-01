@@ -502,23 +502,20 @@ export function parseMagnificOrFreepik(
       : `magnific_${resourceId}.${ext}`;
 
     /*
-     * Endpoint oficial.
-     *
-     * A plataforma continua responsável
-     * por validar a autorização.
+     * Endpoint oficial da API REST.
+     * api.magnific.com e api.freepik.com são os servidores de API oficiais
+     * (não confundir com o portal web www.magnific.com que retorna 404).
      */
-    const primaryDownloadUrl = `https://www.magnific.com/api/v1/resources/${resourceId}/download`;
+    const primaryDownloadUrl =
+      platform === "magnific"
+        ? `https://api.magnific.com/v1/resources/${resourceId}/download`
+        : `https://api.freepik.com/v1/resources/${resourceId}/download`;
 
     const reconstructedPageUrl = parsed.href;
 
     const alternativeDownloadUrls = [
-      primaryDownloadUrl,
-
-      `https://www.freepik.com/api/v1/resources/${resourceId}/download`,
-
       `https://api.magnific.com/v1/resources/${resourceId}/download`,
-
-      `https://www.magnific.com/download/file/${resourceId}`,
+      `https://api.freepik.com/v1/resources/${resourceId}/download`,
     ];
 
     /*

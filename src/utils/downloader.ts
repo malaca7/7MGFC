@@ -30,28 +30,64 @@ export async function executeWebDownload({
     url.includes('/api/v1/resources/') ||
     url.includes('api.magnific.com') ||
     url.includes('api.freepik.com') ||
+    url.includes('www.magnific.com/api') ||
+    url.includes('www.freepik.com/api') ||
     url.includes('/download/file/');
 
   if (isApiEndpoint) {
-    const headers: Record<string, string> = {
-      Accept: 'application/json, text/plain, */*',
-    };
-
-    if (apiKey) {
-      headers['Authorization'] = `Bearer ${apiKey}`;
+    const cleanApiKey = apiKey?.trim();
+    if (!cleanApiKey) {
+      return {
+        success: false,
+        error:
+          'Chave de API Magnific / Freepik necessária para download direto via API. Insira sua chave ou baixe através da sua sessão oficial na plataforma.',
+      };
     }
 
-    const urlsToTry = [url, ...(alternativeUrls || [])];
-    let resolvedCandidate: string | null = null;
+    const headers: Record<string, string> = {
+      Accept: 'application/json, text/plain, */*',
+      'x-magnific-api-key': cleanApiKey,
+      'x-freepik-api-key': cleanApiKey,
+      Authorization: `Bearer ${cleanApiKey}`,
+    };
 
-    for (const candidateEndpoint of urlsToTry) {
+    // Normaliza endpoints para os hosts de API REST oficiais
+    const rawUrls = [url, ...(alternativeUrls || [])];
+    const validEndpoints = Array.from(
+      new Set(
+        rawUrls
+          .map((u) =>
+            u
+              .replace('www.magnific.com/api', 'api.magnific.com')
+              .replace('www.freepik.com/api', 'api.freepik.com')
+          )
+          .filter(
+            (u) =>
+              u.startsWith('https://api.magnific.com') ||
+              u.startsWith('https://api.freepik.com')
+          )
+      )
+    );
+
+    let resolvedCandidate: string | null = null;
+    let lastApiError: string | null = null;
+
+    for (const candidateEndpoint of validEndpoints) {
       try {
         const response = await fetch(candidateEndpoint, {
           method: 'GET',
           headers,
         });
 
-        if (!response.ok) continue;
+        if (!response.ok) {
+          const errData = await response.json().catch(() => null);
+          if (errData?.message) {
+            lastApiError = errData.message;
+          } else {
+            lastApiError = `A API retornou HTTP ${response.status}`;
+          }
+          continue;
+        }
 
         const contentType = (response.headers.get('content-type') || '').toLowerCase();
         if (contentType.includes('application/json')) {
@@ -62,21 +98,46 @@ export async function executeWebDownload({
             data?.file ??
             data?.data?.url ??
             data?.data?.download_url ??
-            data?.data?.file;
+            data?.data?.file ??
+            data?.data?.attributes?.download_url ??
+            data?.data?.attributes?.url ??
+            data?.attributes?.download_url ??
+            data?.attributes?.url;
 
           if (typeof candidate === 'string' && candidate.startsWith('http')) {
             resolvedCandidate = candidate;
             break;
           }
         }
-      } catch {
-        // Tenta próxima URL
+      } catch (fetchErr: any) {
+        lastApiError = fetchErr?.message || 'Falha ao conectar com a API oficial.';
       }
     }
 
-    if (resolvedCandidate) {
-      finalUrl = resolvedCandidate;
+    if (!resolvedCandidate) {
+      return {
+        success: false,
+        error:
+          lastApiError ||
+          'Chave de API não autorizada ou sem permissão para este recurso Premium.',
+      };
     }
+
+    finalUrl = resolvedCandidate;
+  }
+
+  // Guarda de segurança: NUNCA disparar endpoints de API ou URLs de texto/HTML no navegador
+  if (
+    finalUrl.includes('api.magnific.com') ||
+    finalUrl.includes('api.freepik.com') ||
+    finalUrl.includes('/api/v1/') ||
+    finalUrl.includes('www.magnific.com/api') ||
+    finalUrl.includes('www.freepik.com/api')
+  ) {
+    return {
+      success: false,
+      error: 'Não foi possível resolver o link do arquivo binário para download.',
+    };
   }
 
   // 2. Tentativa de download com acompanhamento de progresso (Streaming Fetch)
