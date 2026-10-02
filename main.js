@@ -1,32 +1,45 @@
 // main.js
-import PuppeteerDownloader from './src/puppeteerDownloader.js';
-import { readFileSync } from 'fs';
-import { dirname, join } from 'path';
+import { getOfficialDownloadLink } from './src/keyvivaClient.js';
+import fs from 'fs';
+import path from 'path';
 import { fileURLToPath } from 'url';
 
-// --- Código boilerplate para obter o __dirname em módulos ES ---
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-// --------------------------------------------------------------
-
-// Carrega o arquivo JSON de forma síncrona
-const configPath = join(__dirname, 'config', 'metadados_projeto.json');
-const config = JSON.parse(readFileSync(configPath, 'utf-8'));
+const __dirname = path.dirname(__filename);
 
 async function main() {
-  console.log('Iniciando o processo de download via automação de navegador...');
+  console.log('🚀 [7MGFC] Iniciando processo de download oficial premium...');
 
-  // A URL completa do recurso no Magnific
-  const magnificUrl = "https://www.magnific.com/premium-psd/eletro-funk-party-flyer-template-with-dj-lineup_433136414.htm#fromView=search&page=2&position=9&uuid=4657d59e-c002-4e92-8328-8a7aba170633&track=ais_hybrid&query=flyer+show";
+  // URL do recurso (pode ser passada via argumento de linha de comando ou padrão)
+  const argUrl = process.argv[2];
+  const magnificUrl = argUrl || "https://www.magnific.com/premium-psd/eletro-funk-party-flyer-template-with-dj-lineup_433136414.htm#fromView=search&page=2&position=9&uuid=4657d59e-c002-4e92-8328-8a7aba170633&track=ais_hybrid&query=flyer+show";
 
-  const downloader = new PuppeteerDownloader(false); // 'false' para ver o navegador, 'true' para oculto
-  
   try {
-    const result = await downloader.downloadFile(magnificUrl);
-    console.log('\n✅ SUCESSO! Processo finalizado.');
-    console.log(`📁 Arquivo salvo em: ${result.filePath}`);
+    console.log(`🔗 Recurso: ${magnificUrl}`);
+    console.log('⚡ Conectando ao motor de geração de links oficiais...');
+    const result = await getOfficialDownloadLink(magnificUrl);
+    
+    console.log(`\n✅ Link oficial obtido com sucesso!`);
+    console.log(`📦 Arquivo: ${result.fileName}`);
+    console.log(`🔗 CDN URL: ${result.downloadUrl}`);
+
+    const outputDir = path.join(__dirname, 'downloads');
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+    const outputPath = path.join(outputDir, result.fileName);
+
+    console.log(`⬇️ Baixando arquivo oficial para: ${outputPath}...`);
+    const fileRes = await fetch(result.downloadUrl);
+    if (!fileRes.ok) throw new Error(`Falha ao baixar do CDN: HTTP ${fileRes.status}`);
+
+    const buffer = Buffer.from(await fileRes.arrayBuffer());
+    fs.writeFileSync(outputPath, buffer);
+
+    console.log(`\n🎉 SUCESSO! Arquivo salvo em: ${outputPath} (${(buffer.length / (1024 * 1024)).toFixed(2)} MB)`);
+    console.log(`📊 Cota: ${result.quota.used}/${result.quota.limit} usadas (Restam ${result.quota.remaining})`);
   } catch (error) {
-    console.error('\n💥 Ocorreu um erro crítico durante a execução:', error.message);
+    console.error('\n💥 Erro durante a execução:', error.message);
   }
 }
 
