@@ -99,8 +99,6 @@ export interface AppSettings {
   notifications: boolean;
   maxHistoryItems: number;
   magnificApiKey?: string;
-  bypassPremium?: boolean;
-  devMockMode?: boolean;
 }
 
 export interface UserSession {
